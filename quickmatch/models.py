@@ -37,3 +37,9 @@ class Meeting(models.Model):
         if self.current_participants > 0:
             self.current_participants -= 1
             self.save()
+
+
+class MeetingChat(models.Modes):
+    role = models.ForeignKey("Metting")
+    content = models.CharField(max_length=255)  # TextFields 고려
+    created_at = models.DateTimeField(auto_now_add=True)
