@@ -46,6 +46,7 @@ class User(AbstractUser): # class User(AbstractUser):
 
     height = models.PositiveIntegerField(blank=True, null=True)
     weight = models.PositiveIntegerField(blank=True, null=True)
+    location = models.CharField(blank=True, null=True)  # 지역, 고민중
     
     friend = models.ManyToManyField('self', on_delete=models.SET_NULL, null=True, blank=True, symmetrical=True)
     created_at = models.DateTimeField(auto_now_add=True)
