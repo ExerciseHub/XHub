@@ -7,6 +7,7 @@ User = get_user_model()
 # Create your models here.
 class Meeting(models.Model):
     title = models.CharField(max_length=100)
+    organizer = models.ForeignKey(User, on_delete=models.CASCADE)
     description = models.TextField(blank=True, null=True)
     age = models.DateField(blank=True, null=True)
     rating = models.PositiveIntegerField(default=0)

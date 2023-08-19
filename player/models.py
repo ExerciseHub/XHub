@@ -28,7 +28,6 @@ class CustomUserManager(BaseUserManager):
 class User(AbstractUser): # class User(AbstractUser):
     email = models.EmailField(max_length=200, unique=True)
     activity_point = models.PositiveIntegerField(default=0)
-    gather_status = models.CharField(max_length=100, blank=True, null=True)
 
     # Profile
     nickname = models.CharField(max_length=100)

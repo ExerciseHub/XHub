@@ -16,6 +16,7 @@ class Post(models.Model):
 
 
 class Comment(models.Modes):
+    post = models.ForeignKey("Post", on_delete=models.CASCADE)
     writer = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
     like = models.PositiveIntegerField(default=0)
