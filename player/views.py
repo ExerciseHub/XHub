@@ -1,7 +1,7 @@
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import generics, status, filters
-
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.generics import (
     CreateAPIView,
@@ -9,16 +9,12 @@ from rest_framework.generics import (
     RetrieveUpdateAPIView,
     ListAPIView,
 )
-from rest_framework import status
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User
 from .serializers import (
     UserSerializer,
     LoginSerializer,
     UserUpdateSerializer,
 )
-from .models import User
 
 
 class RegisterView(generics.CreateAPIView):
@@ -109,4 +105,30 @@ class FriendListView(ListAPIView):
     def get_queryset(self):
         user = self.request.user
         return user.friend.all()
+
+
+class AddFriendView(CreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserSerializer
+
+    def create(self, request, *args, **kwargs):
+        friend_id = request.data.get('friend_id')
+
+        if not friend_id:
+            return Response({"error": "friend_id 필드는 필수입니다."})
+        
+        try:
+            friend = User.objects.get(id=friend_id)
+        except User.DoesNotExist:
+            return Response({"error": "해당 ID의 사용자를 찾을 수 없습니다."})
+        
+        if friend == request.user:
+            return Response({"error": "자신을 친구로 추가할 수 없습니다."})
+        
+        request.user.friend.add(friend)
+
+        try:
+            return Response({"message": f"{friend.nickname}님이 친구 목록에 추가되었습니다."}, status=status.HTTP_201_CREATED)
+        except ValueError:
+            return Response({"message": f"{friend.email}님이 친구 목록에 추가되었습니다."}, status=status.HTTP_201_CREATED)
 
