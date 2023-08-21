@@ -33,19 +33,19 @@ class RegistrationTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
-# class UnregisterTestCase(APITestCase):
-#     def setUp(self):
-#         # 테스트에 사용할 사용자 생성
-#         self.user = User.objects.create_user(
-#             email="test@example.com", password="test", nickname="testuser"
-#         )
+class UnregisterTestCase(APITestCase):
+    def setUp(self):
+        # 테스트에 사용할 사용자 생성
+        self.user = User.objects.create_user(
+            email="test@example.com", password="test", nickname="testuser"
+        )
 
-#     def test_unregister(self):
-#         # 생성한 사용자로 인증된 클라이언트 생성
-#         self.client.force_authenticate(user=self.user)
-#         # 회원 탈퇴 API 엔드포인트 호출
-#         response = self.client.delete(reverse("player:unregister"))
-#         # 응답 상태코드 확인 (204 No Content)
-#         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-#         # 사용자 삭제 여부 확인
-#         self.assertEqual(User.objects.count(), 0)
+    def test_unregister(self):
+        # 생성한 사용자로 인증된 클라이언트 생성
+        self.client.force_authenticate(user=self.user)
+        # 회원 탈퇴 API 엔드포인트 호출
+        response = self.client.delete(reverse("player:unregister"))
+        # 응답 상태코드 확인 (204 No Content)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        # 사용자 삭제 여부 확인
+        self.assertEqual(User.objects.count(), 0)
