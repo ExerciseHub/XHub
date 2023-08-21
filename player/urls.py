@@ -8,6 +8,7 @@ from .views import (
     UnregisterUserView,
     UserListView,
     FriendListView,
+    AddFriendView
     )
 
 app_name = "player"
@@ -34,4 +35,7 @@ urlpatterns = [
 
     # 친구 조회
     path('friends/', FriendListView, name='friends'),
+
+    # 친구 추가
+    path('add_friend/', AddFriendView.as_view(), name='add_friend'),
 ]
