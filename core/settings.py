@@ -105,9 +105,9 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'xhubdb', # database 이름 (서버말고)
+        'NAME': config('DB_NAME'), # database 이름 (서버말고)
         'USER': 'postgres', # server User 이름
-        'PASSWORD': 'kid14128', # server User 암호 (임시: 털려도 되는 암호)
+        'PASSWORD': '여기에암호', # server User 암호
         'HOST': 'localhost', # localhost 로 해두면 로컬 내 postgres DB로 연결
         'port': '5432', # postgres DB의 포트넘버 기본값
     }
