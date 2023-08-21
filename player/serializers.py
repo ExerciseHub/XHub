@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from django.contrib.auth import authenticate
+
 from .models import User
 from django.contrib.auth import authenticate
 from .models import User
@@ -40,3 +42,37 @@ class LoginSerializer(serializers.Serializer):
         
         return {'email': user.email, 'user': user}
 
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = [
+            'email',
+            'password',
+            'activity_point',
+            'profile_img',
+            'age',
+            'gender',
+            'category',
+            'position',
+            'height',
+            'weight',
+            'location',
+        ]
+
+        read_only_fields = ('token', 'email', 'activity_poins',)
+
+        def update(self, instance, validated_data):
+            password = validated_data.pop('password', None)
+
+            for key, value in validated_data.items():
+                setattr(instance, key, value)
+
+            if password is not None:
+                instance.set_password(password)
+
+            instance.save()
+
+            return instance

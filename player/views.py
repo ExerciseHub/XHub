@@ -5,13 +5,19 @@ from rest_framework.response import Response
 from rest_framework.generics import (
     CreateAPIView,
     DestroyAPIView,
-    )
+    RetrieveUpdateAPIView,
+)
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import LoginSerializer
-from .serializers import UserSerializer
 from .models import User
+from .serializers import (
+    UserSerializer,
+    LoginSerializer,
+    UserUpdateSerializer,
+)
+from .models import User
+
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -54,8 +60,31 @@ class Logout(DestroyAPIView):
         return response
 
 
+class Update(RetrieveUpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+    # renderer_classes 보류
+    serializer_class = UserUpdateSerializer
+
+    def get(self, reuqest, *args, **kwargs):
+        serializer = self.serializer_class(reuqest.user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def patch(self, request, *args, **kwargs):
+        serializer_data = request.data
+
+        serializer = self.serializer_class(request.user, data=serializer_data, partial=True)
+
+        serializer.is_valid(raise_exception=True)
+
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+RegisterView = RegisterView.as_view()
 Login = Login.as_view()
 Logout = Logout.as_view()
+Update = Update.as_view()
 
 
 class UnregisterUserView(APIView):
