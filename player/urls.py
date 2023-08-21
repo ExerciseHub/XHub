@@ -1,4 +1,5 @@
 from django.urls import path
+from .views import LoginView
 
 app_name = 'player'
 
@@ -7,7 +8,7 @@ urlpatterns = [
     # path('register/', 기능, name='register'),
 
     # 로그인
-    # path('login/', 기능, name='login'),
+    path('login/', LoginView.as_view(), name='login'),
 
     # 로그아웃
     # path('logout/', 기능, name='logout'),
