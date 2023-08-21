@@ -9,7 +9,7 @@ class RegistrationTestCase(APITestCase):
         data = {
             "email": "test@example.com",
             "password": "test",
-            "username": "testuser",
+            "nickname": "testuser",
             # "profile_image": "test.jpg",
             # "age": "2023-01-01"
         }
