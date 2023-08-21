@@ -31,7 +31,7 @@ class User(AbstractUser): # class User(AbstractUser):
 
     # Profile
     nickname = models.CharField(max_length=100)
-    profile_img = models.ImageField(blank=True, null=True)
+    profile_img = models.ImageField(upload_to='images/', blank=True, null=True)
     age = models.DateField(blank=True, null=True)
     
     GENDER_CHOICE = (("M", "남"), ("W", "여"), ("X", "비공개"))
