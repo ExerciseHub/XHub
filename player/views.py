@@ -1,4 +1,4 @@
-from rest_framework import generics, status
+from rest_framework import generics, status, filters
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -6,6 +6,7 @@ from rest_framework.generics import (
     CreateAPIView,
     DestroyAPIView,
     RetrieveUpdateAPIView,
+    ListAPIView,
 )
 
 from .serializers import (
@@ -79,7 +80,28 @@ class Update(RetrieveUpdateAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class UserListView(ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated,]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['email', 'nickname']
+
+
+class FriendListView(ListAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated,]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['email', 'nickname']
+
+    def get_queryset(self):
+        user = self.request.user
+        return user.friend.all()
+
+
 RegisterView = RegisterView.as_view()
 Login = Login.as_view()
 Logout = Logout.as_view()
 Update = Update.as_view()
+UserListView = UserListView.as_view()
+FriendListView = FriendListView.as_view()
