@@ -1,6 +1,6 @@
 from django.urls import path
 
-app_name = 'player'
+app_name = 'board'
 
 urlpatterns = [
     # 게시글 조회(list)
