@@ -60,4 +60,37 @@
 - board
     - Post
     - Comment
-    
+
+
+## URL
+
+|   앱 이름  |        기능        |                          URL                         | Method |
+|:----------:|:------------------:|:----------------------------------------------------:|:------:|
+| player     | 회원가입           | 도메인/player/register/                              | POST   |
+|            | 로그인             | 도메인/player/login/                                 | POST   |
+|            | 로그아웃           | 도메인/player/logout/                                | POST   |
+|            | 회원수정           | 도메인/player/update/                                | POST   |
+|            | 회원탈퇴           | 도메인/player/<str:playerid>/                        | POST   |
+|            | 회원조회           | 도메인/player/search/<str:playerid>/                 | GET    |
+|            | 친구추가           | 도메인/player/                                       |        |
+|            | 활동점수           | 도메인/player/                                       |        |
+|            | 친구와채팅         | 도메인/player/                                       |        |
+|            | 그룹여부           | 도메인/player/                                       |        |
+| quickmatch | 모임만들기         | 도메인/quickmatch/create/                            | POST   |
+|            | 모임삭제           | 도메인/quickmatch/<int:quickmatchId>/delete/         | POST   |
+|            | 모임참가           | 도메인/quickmatch/join/<int:quickmatchId>/           | POST   |
+|            | 모임상태변경       | 도메인/quickmatch/<int:quickmatchId>/status/         | GET    |
+|            | 회원평가           | 도메인/quickmatch/                                   |        |
+|            | 모임만족도         | 도메인/quickmatch/                                   |        |
+|            | 대화기능(그룹대화) | 도메인/quickmatch/                                   |        |
+| board      | 게시글 조회(전체)  | 도메인/board/                                        | GET    |
+|            | 게시글 생성        | 도메인/board/create/                                 | POST   |
+|            | 게시글 상세보기    | 도메인/board/<int:board_id>/detail/                  | GET    |
+|            | 게시글 삭제        | 도메인/board/<int:board_id>/delete/                  | POST   |
+|            | 게시글 수정        | 도메인/board/<int:board_id>/update/                  | POST   |
+|            | 게시글좋아요       | 도메인/board/<int:board_id>/like/                    | GET    |
+|            | 댓글 달기          | 도메인/board/<int:board_id>/comment/write/           | POST   |
+|            | 댓글 삭제          | 도메인/board/<int:board_id>/<int:comment_id>/delete/ | POST   |
+|            | 댓글 수정          | 도메인/board/<int:board_id>/<int:comment_id>/edit    | PUT    |
+|            | 댓글좋아요         | 도메인/board/<int:board_id>/<int:comment_id>/like/   | GET    |
+
