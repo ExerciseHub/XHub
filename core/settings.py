@@ -72,7 +72,11 @@ REST_FRAMEWORK = {
         # 'rest_framework.permissions.AllowAny', # 누구나 접근
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
-    )
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        # 'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny', # 누구나 접근
+    ),
 }
 
 MIDDLEWARE = [
@@ -161,6 +165,9 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# JWT 토큰 만료 시간 설정
 
 SIMPLE_JWT = {
     'ALGORITHM': 'HS256',

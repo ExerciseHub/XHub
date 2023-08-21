@@ -132,11 +132,3 @@ class AddFriendView(CreateAPIView):
         except ValueError:
             return Response({"message": f"{friend.email}님이 친구 목록에 추가되었습니다."}, status=status.HTTP_201_CREATED)
 
-
-RegisterView = RegisterView.as_view()
-Login = Login.as_view()
-Logout = Logout.as_view()
-Update = Update.as_view()
-UnregisterUserView = UnregisterUserView.as_view()
-UserListView = UserListView.as_view()
-FriendListView = FriendListView.as_view()
