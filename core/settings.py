@@ -106,10 +106,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': config('DB_NAME'), # database 이름 (서버말고)
-        'USER': 'postgres', # server User 이름
-        'PASSWORD': '여기에암호', # server User 암호
-        'HOST': 'localhost', # localhost 로 해두면 로컬 내 postgres DB로 연결
-        'port': '5432', # postgres DB의 포트넘버 기본값
+        'USER': config('DB_USER'), # server User 이름
+        'PASSWORD': config('DB_PASSWORD'), # server User 암호
+        'HOST': config('DB_HOST'), # localhost 로 해두면 로컬 내 postgres DB로 연결
+        'port': config('DB_PORT'), # postgres DB의 포트넘버 기본값
     }
 }
 
