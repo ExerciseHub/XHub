@@ -110,12 +110,3 @@ class FriendListView(ListAPIView):
         user = self.request.user
         return user.friend.all()
 
-
-
-RegisterView = RegisterView.as_view()
-Login = Login.as_view()
-Logout = Logout.as_view()
-Update = Update.as_view()
-UnregisterUserView = UnregisterUserView.as_view()
-UserListView = UserListView.as_view()
-FriendListView = FriendListView.as_view()
