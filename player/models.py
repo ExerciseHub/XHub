@@ -25,7 +25,8 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 
-class User(AbstractUser): # class User(AbstractUser):
+class User(AbstractUser):
+    username = None
     email = models.EmailField(max_length=200, unique=True)
     activity_point = models.PositiveIntegerField(default=0)
 
@@ -54,6 +55,7 @@ class User(AbstractUser): # class User(AbstractUser):
     objects = CustomUserManager()  # 재정의된 매니저 클래스 추가
 
     USERNAME_FIELD = "email"  # 고유 식별자로 이메일 사용
+    EMAIL_FIELD = 'email'
     REQUIRED_FIELDS = []  # 이제 기본적으로 이메일이 필요하므로 이 목록에서 제거
 
 
