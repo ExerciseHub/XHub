@@ -35,7 +35,7 @@ class User(AbstractUser): # class User(AbstractUser):
     age = models.DateField(blank=True, null=True)
     
     GENDER_CHOICE = (("M", "남"), ("W", "여"), ("X", "비공개"))
-    gender = models.CharField(choices=GENDER_CHOICE, max_length=50)
+    gender = models.CharField(choices=GENDER_CHOICE, max_length=50, blank=True, null=True)
 
     CATEGORY_CHOICE = (("축구(풋살)", "축구(풋살)"), ("농구", "농구"), ("배트민턴", "배트민턴"), ("볼링", "볼링"), ("테니스", "테니스"), ("골프", "골프"))
     category = models.CharField(choices=CATEGORY_CHOICE, max_length=50, blank=True, null=True)

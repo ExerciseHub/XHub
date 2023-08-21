@@ -1,8 +1,20 @@
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework.response import Response
-from rest_framework import status
-from .serializers import UserSerializer
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.generics import (
+    CreateAPIView,
+    DestroyAPIView,
+    RetrieveUpdateAPIView,
+)
+
+from .serializers import (
+    UserSerializer,
+    LoginSerializer,
+    UserUpdateSerializer,
+)
 from .models import User
+
 
 
 class RegisterView(generics.CreateAPIView):
@@ -15,17 +27,6 @@ class RegisterView(generics.CreateAPIView):
             serializer.save()
             return Response({"message": "회원가입 성공!"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.generics import (
-    CreateAPIView,
-    DestroyAPIView,
-    )
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework_simplejwt.tokens import RefreshToken
-
-from .serializers import LoginSerializer
 
 
 class Login(CreateAPIView):
@@ -57,5 +58,28 @@ class Logout(DestroyAPIView):
         return response
 
 
+class Update(RetrieveUpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+    # renderer_classes 보류
+    serializer_class = UserUpdateSerializer
+
+    def get(self, reuqest, *args, **kwargs):
+        serializer = self.serializer_class(reuqest.user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def patch(self, request, *args, **kwargs):
+        serializer_data = request.data
+
+        serializer = self.serializer_class(request.user, data=serializer_data, partial=True)
+
+        serializer.is_valid(raise_exception=True)
+
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+RegisterView = RegisterView.as_view()
 Login = Login.as_view()
 Logout = Logout.as_view()
+Update = Update.as_view()
