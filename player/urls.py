@@ -2,6 +2,7 @@ from django.urls import path
 from .views import (
     Login,
     Logout,
+    Update
     )
 
 app_name = 'player'
@@ -17,7 +18,7 @@ urlpatterns = [
     path('logout/', Logout, name='logout'),
 
     # 회원 정보수정
-    # path('update/', 기능, name='update'),
+    path('update/', Update, name='update'),
 
     # 회원 탈퇴
     # path('<str:playerId>/', 기능, name='remove'),
