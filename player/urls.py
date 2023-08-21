@@ -1,9 +1,11 @@
 from django.urls import path
+from .views import RegisterView, UnregisterUserView
 from .views import (
     RegisterView,
     Login,
     Logout,
     Update,
+    UnregisterUserView,
     UserListView,
     FriendListView,
     )
@@ -25,6 +27,7 @@ urlpatterns = [
 
     # 회원 탈퇴
     # path("<str:playerId>/", 기능, name="remove"),
+    path("unregister/", UnregisterUserView, name="unregister"),
 
     # 전체 회원 조회
     path("search/", UserListView, name="search"),

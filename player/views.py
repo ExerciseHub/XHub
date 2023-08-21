@@ -1,21 +1,24 @@
 from rest_framework import generics, status, filters
+
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.generics import (
     CreateAPIView,
     DestroyAPIView,
     RetrieveUpdateAPIView,
     ListAPIView,
 )
-
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework_simplejwt.tokens import RefreshToken
+from .models import User
 from .serializers import (
     UserSerializer,
     LoginSerializer,
     UserUpdateSerializer,
 )
 from .models import User
-
 
 
 class RegisterView(generics.CreateAPIView):
@@ -80,6 +83,15 @@ class Update(RetrieveUpdateAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class UnregisterUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request):
+        user = request.user
+        user.delete()
+        return Response({"message": "회원탈퇴가 완료되었습니다."}, status=status.HTTP_204_NO_CONTENT)
+
+
 class UserListView(ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -99,9 +111,11 @@ class FriendListView(ListAPIView):
         return user.friend.all()
 
 
+
 RegisterView = RegisterView.as_view()
 Login = Login.as_view()
 Logout = Logout.as_view()
 Update = Update.as_view()
+UnregisterUserView = UnregisterUserView.as_view()
 UserListView = UserListView.as_view()
 FriendListView = FriendListView.as_view()
