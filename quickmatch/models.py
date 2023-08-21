@@ -24,7 +24,8 @@ class Meeting(models.Model):
 
     location = models.CharField(max_length=255)  # 고민
     # 참여자
-    meeting_memver = models.ManyToManyField(User, blank=True, null=True)  # 고민
+    # meeting_member = models.ManyToManyField(User, blank=True, null=True)  # 고민
+    meeting_member = models.CharField(max_length=255, blank=True, null=True)
 
     max_participants = models.PositiveIntegerField()
     current_participants = models.PositiveIntegerField(default=0)
@@ -40,7 +41,7 @@ class Meeting(models.Model):
             self.save()
 
 
-class MeetingChat(models.Modes):
-    role = models.ForeignKey("Metting")
+class MeetingChat(models.Model):
+    role = models.ForeignKey("Meeting", on_delete=models.CASCADE)
     content = models.CharField(max_length=255)  # TextFields 고려
     created_at = models.DateTimeField(auto_now_add=True)
