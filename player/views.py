@@ -90,8 +90,8 @@ class UnregisterUserView(APIView):
         return Response({"message": "회원탈퇴가 완료되었습니다."}, status=status.HTTP_204_NO_CONTENT)
 
 
-RegisterView = RegisterView.as_view()
-Login = Login.as_view()
-Logout = Logout.as_view()
-Update = Update.as_view()
-UnregisterUserView = UnregisterUserView.as_view()
+# RegisterView = RegisterView.as_view()
+# Login = Login.as_view()
+# Logout = Logout.as_view()
+# Update = Update.as_view()
+# UnregisterUserView = UnregisterUserView.as_view()
