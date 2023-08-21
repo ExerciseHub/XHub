@@ -1,5 +1,9 @@
 from django.urls import path
 from .views import RegisterView
+from .views import (
+    Login,
+    Logout,
+    )
 
 app_name = "player"
 
@@ -8,10 +12,10 @@ urlpatterns = [
     path("register/", RegisterView.as_view(), name="register"),
 
     # 로그인
-    # path("login/", 기능, name="login"),
+    path('login/', Login, name='login'),
 
     # 로그아웃
-    # path("logout/", 기능, name="logout"),
+    path('logout/', Logout, name='logout'),
 
     # 회원 정보수정
     # path("update/", 기능, name="update"),
