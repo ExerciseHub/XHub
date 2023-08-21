@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import RegisterView
+from .views import RegisterView, UnregisterUserView
 
 app_name = "player"
 
@@ -18,6 +18,7 @@ urlpatterns = [
 
     # 회원 탈퇴
     # path("<str:playerId>/", 기능, name="remove"),
+    path("unregister/", UnregisterUserView.as_view(), name="unregister"),
 
     # 회원 조회
     # path("search/<str:playerId>/", 기능, name="search"),

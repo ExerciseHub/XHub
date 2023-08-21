@@ -24,3 +24,16 @@ class RegistrationTestCase(APITestCase):
         }
         response = self.client.post(reverse("player:register"), data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class UnregisterTestCase(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email="", password="test", nickname="testuser"
+        )
+
+    def test_unregister(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.delete(reverse("player:unregister"))
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(User.objects.count(), 0)
