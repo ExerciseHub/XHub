@@ -28,11 +28,10 @@ class CustomUserManager(BaseUserManager):
 class User(AbstractUser): # class User(AbstractUser):
     email = models.EmailField(max_length=200, unique=True)
     activity_point = models.PositiveIntegerField(default=0)
-    gather_status = models.CharField(max_length=100, blank=True, null=True)
 
     # Profile
     nickname = models.CharField(max_length=100)
-    profile_img = models.ImageField(blank=True, null=True)
+    profile_img = models.ImageField(upload_to='images/', blank=True, null=True)
     age = models.DateField(blank=True, null=True)
     
     GENDER_CHOICE = (("M", "남"), ("W", "여"), ("X", "비공개"))
@@ -46,6 +45,7 @@ class User(AbstractUser): # class User(AbstractUser):
 
     height = models.PositiveIntegerField(blank=True, null=True)
     weight = models.PositiveIntegerField(blank=True, null=True)
+    location = models.CharField(blank=True, null=True)  # 지역, 고민중
     
     friend = models.ManyToManyField('self', on_delete=models.SET_NULL, null=True, blank=True, symmetrical=True)
     created_at = models.DateTimeField(auto_now_add=True)
