@@ -60,6 +60,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             'height',
             'weight',
             'location',
+            'friend',
         ]
 
         read_only_fields = ('token', 'email', 'activity_poins',)

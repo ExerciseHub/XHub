@@ -4,7 +4,10 @@ from .views import (
     RegisterView,
     Login,
     Logout,
-    Update
+    Update,
+    UnregisterUserView,
+    UserListView,
+    FriendListView,
     )
 
 app_name = "player"
@@ -29,6 +32,9 @@ urlpatterns = [
     # path("<str:playerId>/", 기능, name="remove"),
     path("unregister/", UnregisterUserView.as_view(), name="unregister"),
 
-    # 회원 조회
-    # path("search/<str:playerId>/", 기능, name="search"),
+    # 전체 회원 조회
+    path("search/", UserListView.as_view(), name="search"),
+
+    # 친구 조회
+    path('friends/', FriendListView.as_view(), name='friends'),
 ]
