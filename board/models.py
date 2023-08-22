@@ -4,7 +4,9 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-# Create your models here.
+
+# Post 게시글 부분
+
 class Post(models.Model):
     title = models.CharField(max_length=100)
     writer = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -13,7 +15,10 @@ class Post(models.Model):
     like = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    public = models.BooleanField(default=True) # 공개 여부
 
+
+# Comment 댓글 부분
 
 class Comment(models.Model):
     post = models.ForeignKey("Post", on_delete=models.CASCADE)
