@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status, permissions
 
 from .models import Post
-from .serializers import PostSerializers
+from .serializers import PostSerializers, CommentSerializer
 from rest_framework.permissions import IsAuthenticated, BasePermission
 
 # 게시글 작성 시, 권한을 확인합니다.
@@ -82,3 +82,11 @@ class PostDeleteView(DestroyAPIView):
     permission_classes = (IsAuthenticated, IsOwner)
     lookup_field = 'id'
 
+
+class CommentWriteView(CreateAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Post.objects.all()
+    serializer_class = CommentSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(writer=self.request.user)  # 로그인 한 유저가 작성자로 저장
