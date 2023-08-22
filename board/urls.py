@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import PostCreateView, PostListView
+from .views import PostCreateView, PostListView, PostDetailView
 
 app_name = 'board'
 
@@ -8,11 +8,10 @@ urlpatterns = [
     path('', PostListView.as_view(), name='list'),
 
     # 게시글 생성
-    # path('write/', 기능, name='write'),
     path('write/', PostCreateView.as_view(), name='write'),
 
     # 게시글 상세보기
-    # path('<int:board_id>/detail/', 기능, name='detail'),
+    path('<int:id>/', PostDetailView.as_view(), name='detail'),
 
     # 게시글 삭제
     # path('<int:board_id>/delete/', 기능, name='delete'),

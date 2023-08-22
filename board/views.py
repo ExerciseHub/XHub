@@ -1,4 +1,4 @@
-from rest_framework.generics import CreateAPIView,ListAPIView
+from rest_framework.generics import CreateAPIView,ListAPIView, RetrieveAPIView
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
@@ -25,3 +25,11 @@ class PostListView(ListAPIView):
     filter_backends = [OrderingFilter]
     ordering_fields = ['created_at', 'like']  # 어떤 필드에 대해 정렬할지 지정
     ordering = ['-created_at']  # 기본 정렬 방식은 최신 게시글
+
+
+class PostDetailView(RetrieveAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializers
+    permission_classes = [AllowAny,]
+    lookup_field = 'id'  # URL에서 Post ID를 어떤 필드로 받아올지 지정
+
