@@ -73,7 +73,8 @@
 |            | 회원탈퇴           | 도메인/player/unregister/                            | POST   |   |
 |            | 전체 회원조회      | 도메인/player/search/                                | GET    |   |
 |            | 친구 조회          | 도메인/player/friends/                               | GET    |   |
-|            | 친구추가           | 도메인/player/add_friend/                            | POST   |   |
+|            | 친구 추가          | 도메인/player/add_friend/                            | POST   |   |
+|            | 친구 삭제          | 도메인/player/rm_friend/<int:friend_id>/             | POST   |   |
 |            | 활동점수           | 도메인/player/                                       |        |   |
 |            | 친구와채팅         | 도메인/player/                                       |        |   |
 |            | 그룹여부           | 도메인/player/                                       |        |   |
