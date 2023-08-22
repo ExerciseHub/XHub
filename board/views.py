@@ -63,6 +63,7 @@ class UpdatePostView(RetrieveUpdateAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializers
     permission_classes = [IsAuthenticated]
+    lookup_field = 'id'
 
 
 class IsOwner(BasePermission):
@@ -91,7 +92,13 @@ class CommentWriteView(CreateAPIView):
     serializer_class = CommentSerializer
 
     def perform_create(self, serializer):
-        serializer.save(writer=self.request.user)  # 로그인 한 유저가 작성자로 저장
+        post_id = self.kwargs.get('board_id')  # URL에서 Post ID를 가져옴
+        try:
+            post = Post.objects.get(id=post_id)
+        except Post.DoesNotExist:
+            return Response({"error": "Post does not exist."})
+        
+        serializer.save(writer=self.request.user, post=post)  # 로그인 한 유저가 작성자로 저장 + 가져온 ID에 해당하는 post에 저장
 
 
 class UpdateCommmentView(RetrieveUpdateAPIView):
