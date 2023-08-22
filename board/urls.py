@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import PostCreateView, PostListView, PostDetailView
+from .views import PostCreateView, PostListView, PostDetailView, LikePostView
 
 app_name = 'board'
 
@@ -20,7 +20,7 @@ urlpatterns = [
     # path('<int:board_id>/detail/', 기능, name='update'),
 
     # 게시글 좋아요
-    # path('<int:board_id>/like/', 기능, name='like')
+    path('<int:id>/like/', LikePostView.as_view(), name='like')
 
     # 댓글 작성
     # path('<int:board_id>/comment/write/', 기능, name='cm-write'),

@@ -1,6 +1,8 @@
-from rest_framework.generics import CreateAPIView,ListAPIView, RetrieveAPIView
+from rest_framework.generics import CreateAPIView,ListAPIView, RetrieveAPIView, UpdateAPIView
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.response import Response
+from rest_framework import status
 
 from .models import Post
 from .serializers import PostSerializers
@@ -33,3 +35,24 @@ class PostDetailView(RetrieveAPIView):
     permission_classes = [AllowAny,]
     lookup_field = 'id'  # URL에서 Post ID를 어떤 필드로 받아올지 지정
 
+
+class LikePostView(UpdateAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializers
+    permission_classes = [IsAuthenticated,]
+    lookup_field = 'id'
+
+    def update(self, request, *args, **kwargs):
+        post = self.get_object()
+
+        # 이미 좋아요를 눌렀다면, 좋아요 취소
+        if post.likes.filter(id=request.user.id).exists():
+            post.likes.remove(request.user)
+            post.like -= 1
+            post.save()
+            return Response({"message": "좋아요 취소"}, status=status.HTTP_200_OK)
+        else:
+            post.likes.add(request.user)
+            post.like += 1
+            post.save()
+            return Response({"message": "좋아요 추가"}, status=status.HTTP_200_OK)
