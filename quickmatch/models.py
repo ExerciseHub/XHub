@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-
+from django.core.validators import MinValueValidator
 
 User = get_user_model()
 
@@ -28,7 +28,7 @@ class Meeting(models.Model):
     meeting_member = models.CharField(max_length=255, blank=True, null=True)
 
     max_participants = models.PositiveIntegerField()
-    current_participants = models.PositiveIntegerField(default=0)
+    current_participants = models.PositiveIntegerField(validators=[MinValueValidator(1)], default=1)
 
     def __repr__(self):
         return f"{self.id}:{self.title}-{self.description}-{self.created_at}"
@@ -39,7 +39,7 @@ class Meeting(models.Model):
             self.save()
 
     def remove_participant(self):
-        if self.current_participants > 0:
+        if self.current_participants > 1:
             self.current_participants -= 1
             self.save()
     
