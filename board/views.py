@@ -4,13 +4,14 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework import status, permissions
 
-from .models import Post
+from .models import Post, Comment
 from .serializers import PostSerializers, CommentSerializer
 from rest_framework.permissions import IsAuthenticated, BasePermission
 
 # 게시글 작성 시, 권한을 확인합니다.
 # 권한이 없다면, 401 에러를 반환합니다. 권한이 있다면, 게시글을 작성합니다.
 
+### Post
 class PostCreateView(CreateAPIView):
     permission_classes = [IsAuthenticated]
     queryset = Post.objects.all()
@@ -83,10 +84,25 @@ class PostDeleteView(DestroyAPIView):
     lookup_field = 'id'
 
 
+### Comment
 class CommentWriteView(CreateAPIView):
     permission_classes = [IsAuthenticated]
-    queryset = Post.objects.all()
+    queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 
     def perform_create(self, serializer):
         serializer.save(writer=self.request.user)  # 로그인 한 유저가 작성자로 저장
+
+
+class UpdateCommmentView(RetrieveUpdateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = 'id'
+
+
+class CommentDeleteView(DestroyAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = (IsAuthenticated, IsOwner)
+    lookup_field = 'id'
