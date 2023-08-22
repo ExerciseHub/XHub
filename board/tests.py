@@ -96,7 +96,7 @@ class PostCreateTestCase(APITestCase):
             writer=self.user,
             context="Test content"
         )
-        delete_url = reverse('board:delete', kwargs={'pk': post.pk})
+        delete_url = reverse('board:delete', kwargs={'id': post.id})
         response = self.client.delete(f'/board/{post.id}/delete/')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Post.objects.filter(id=post.id).exists())
@@ -109,7 +109,7 @@ class PostCreateTestCase(APITestCase):
             context="Test content"
         )
         self.client.logout()
-        delete_url = reverse('board:delete', kwargs={'pk': post.pk})
+        delete_url = reverse('board:delete', kwargs={'id': post.id})
         response = self.client.delete(f'/board/{post.id}/delete/')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
@@ -125,7 +125,7 @@ class PostCreateTestCase(APITestCase):
             context="Test content"
         )
         self.client.login(email="user2@example.com", password="testpassword2")
-        delete_url = reverse('board:delete', kwargs={'pk': post.pk})
+        delete_url = reverse('board:delete', kwargs={'id': post.id})
         response = self.client.delete(f'/board/{post.id}/delete/')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         
