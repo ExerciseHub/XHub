@@ -56,6 +56,8 @@ INSTALLED_APPS = [
     # 프레임워크 및 라이브러리?
     'rest_framework',
     'rest_framework_simplejwt',
+    'drf-yasg',
+    'rest_frarmework.swagger',
     
     # 내부 기능(앱)
     'player',
