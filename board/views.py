@@ -1,12 +1,12 @@
-from rest_framework.generics import CreateAPIView,ListAPIView, RetrieveAPIView, UpdateAPIView, RetrieveUpdateAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView, RetrieveUpdateAPIView
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, permissions
 
 from .models import Post
 from .serializers import PostSerializers
-
+from rest_framework.permissions import IsAuthenticated, BasePermission
 
 # 게시글 작성 시, 권한을 확인합니다.
 # 권한이 없다면, 401 에러를 반환합니다. 권한이 있다면, 게시글을 작성합니다.
@@ -32,7 +32,7 @@ class PostListView(ListAPIView):
 class PostDetailView(RetrieveAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializers
-    permission_classes = [AllowAny,]
+    permission_classes = [AllowAny]
     lookup_field = 'id'  # URL에서 Post ID를 어떤 필드로 받아올지 지정
 
 
@@ -62,5 +62,23 @@ class UpdatePostView(RetrieveUpdateAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializers
     permission_classes = [IsAuthenticated]
+
+
+class IsOwner(BasePermission):
+    """
+    글을 작성 한, 로그인 한 해당 유저만이 글을 삭제 할 수 있도록.
+    """
+    
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        
+        return obj.writer == request.user
+
+
+class PostDeleteView(DestroyAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializers
+    permission_classes = (IsAuthenticated, IsOwner)
     lookup_field = 'id'
 

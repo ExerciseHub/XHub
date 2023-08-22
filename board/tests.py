@@ -2,6 +2,7 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from player.models import User
 from .models import Post
+from django.urls import reverse
 
 
 # 테스트 케이스 실행 전 초기 설정을 합니다.
@@ -31,7 +32,7 @@ class PostCreateTestCase(APITestCase):
         # 게시글 데이터를 생성합니다.
 
         post_data = {
-            "gather-title": "테스트 게시글 제목",
+            "gather_title": "테스트 게시글 제목",
             "writer": self.user.id, # 이메일 대신 user.id 로 수정
             "context": "테스트 게시글 내용",
             # "category": "축구(풋살)",
@@ -55,7 +56,7 @@ class PostCreateTestCase(APITestCase):
 
     def test_create_post_missing_data(self):
         post_data = {
-            "gather-title": "테스트 게시글 제목",
+            "gather_title": "테스트 게시글 제목",
             "writer": self.user.email,
         }
 
@@ -68,6 +69,8 @@ class PostCreateTestCase(APITestCase):
 
     # 인증되지 않은 유저의 게시글 생성 테스트를 수행합니다.
 
+
+
     def test_unauthenticated_post_creation(self):
 
         # 유저를 로그아웃시킵니다.
@@ -75,7 +78,7 @@ class PostCreateTestCase(APITestCase):
         self.client.logout()
 
         post_data = {
-            "gather-title": "테스트 게시글 제목",
+            "gather_title": "테스트 게시글 제목",
             "writer": self.user.email,
             "context": "테스트 게시글 내용",
         }
@@ -85,3 +88,44 @@ class PostCreateTestCase(APITestCase):
         # 응답 상태 코드를 확인합니다.
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    # 게시글을 성공적으로 삭제합니다.
+    def test_successful_post_deletion(self):
+        post = Post.objects.create(
+            gather_title="Test Post",
+            writer=self.user,
+            context="Test content"
+        )
+        delete_url = reverse('board:delete', kwargs={'id': post.id})
+        response = self.client.delete(f'/board/{post.id}/delete/')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Post.objects.filter(id=post.id).exists())
+
+    # 인증되지 않은 상태에서 게시글 삭제를 시도합니다.
+    def test_unauthorized_post_deletion(self):
+        post = Post.objects.create(
+            gather_title="Test Post",
+            writer=self.user,
+            context="Test content"
+        )
+        self.client.logout()
+        delete_url = reverse('board:delete', kwargs={'id': post.id})
+        response = self.client.delete(f'/board/{post.id}/delete/')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    # 다른 사용자의 게시글을 삭제하려고 시도합니다.
+    def test_delete_another_users_post(self):
+        user2 = User.objects.create_user(
+            email="user2@example.com",
+            password="testpassword2"
+        )
+        post = Post.objects.create(
+            gather_title="Test Post",
+            writer=self.user,
+            context="Test content"
+        )
+        self.client.login(email="user2@example.com", password="testpassword2")
+        delete_url = reverse('board:delete', kwargs={'id': post.id})
+        response = self.client.delete(f'/board/{post.id}/delete/')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        
