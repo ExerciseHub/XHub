@@ -128,3 +128,12 @@ class LikeCommentView(UpdateAPIView):
             comment.like += 1
             comment.save()
             return Response({"message": "좋아요 추가"}, status=status.HTTP_200_OK)
+
+
+class PostCommentsListView(ListAPIView):
+    serializer_class = CommentSerializer
+    permission_classes = [AllowAny,]
+
+    def get_queryset(self):
+        board_id = self.kwargs['board_id']
+        return Comment.objects.filter(post__id=board_id)
