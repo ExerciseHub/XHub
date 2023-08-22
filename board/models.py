@@ -8,7 +8,7 @@ User = get_user_model()
 # Post 게시글 부분
 
 class Post(models.Model):
-    title = models.CharField(max_length=100)
+    gather_title = models.CharField(max_length=100)
     writer = models.ForeignKey(User, on_delete=models.CASCADE)
     context = models.TextField()
     img = models.ImageField(blank=True, null=True)

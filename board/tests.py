@@ -31,7 +31,7 @@ class PostCreateTestCase(APITestCase):
         # 게시글 데이터를 생성합니다.
 
         post_data = {
-            "title": "테스트 게시글 제목",
+            "gather-title": "테스트 게시글 제목",
             "writer": self.user.id, # 이메일 대신 user.id 로 수정
             "context": "테스트 게시글 내용",
             # "category": "축구(풋살)",
@@ -55,7 +55,7 @@ class PostCreateTestCase(APITestCase):
 
     def test_create_post_missing_data(self):
         post_data = {
-            "title": "테스트 게시글 제목",
+            "gather-title": "테스트 게시글 제목",
             "writer": self.user.email,
         }
 
@@ -75,7 +75,7 @@ class PostCreateTestCase(APITestCase):
         self.client.logout()
 
         post_data = {
-            "title": "테스트 게시글 제목",
+            "gather-title": "테스트 게시글 제목",
             "writer": self.user.email,
             "context": "테스트 게시글 내용",
         }
