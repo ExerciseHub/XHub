@@ -29,7 +29,7 @@ urlpatterns = [
 
     # 회원 정보수정
     # path('update/', Update, name='update'),
-    path('update/', Update.as_view(), name='update'),
+    path('<int:id>/update/', Update.as_view(), name='update'),
 
     # 회원 탈퇴
     # path("<str:playerId>/", 기능, name="remove"),

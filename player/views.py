@@ -61,7 +61,9 @@ class Logout(DestroyAPIView):
 class Update(RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)
     # renderer_classes 보류
+    queryset = User.objects.all()
     serializer_class = UserUpdateSerializer
+    lookup_field = 'id'
 
     def get(self, reuqest, *args, **kwargs):
         serializer = self.serializer_class(reuqest.user)
