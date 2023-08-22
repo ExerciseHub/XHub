@@ -13,6 +13,7 @@ class Post(models.Model):
     like = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    public = models.BooleanField(default=True) # 공개 여부
 
 
 class Comment(models.Model):
