@@ -129,9 +129,9 @@ class AddFriendView(CreateAPIView):
         
         request.user.friend.add(friend)
 
-        try:
+        if friend.nickname:
             return Response({"message": f"{friend.nickname}님이 친구 목록에 추가되었습니다."}, status=status.HTTP_201_CREATED)
-        except ValueError:
+        else:
             return Response({"message": f"{friend.email}님이 친구 목록에 추가되었습니다."}, status=status.HTTP_201_CREATED)
 
 
