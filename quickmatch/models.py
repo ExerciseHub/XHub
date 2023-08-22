@@ -30,6 +30,9 @@ class Meeting(models.Model):
     max_participants = models.PositiveIntegerField()
     current_participants = models.PositiveIntegerField(default=0)
 
+    def __repr__(self):
+        return f"{self.id}:{self.title}-{self.description}-{self.created_at}"
+    
     def add_participant(self):
         if self.current_participants < self.max_participants:
             self.current_participants += 1
@@ -39,6 +42,8 @@ class Meeting(models.Model):
         if self.current_participants > 0:
             self.current_participants -= 1
             self.save()
+    
+    
 
 
 class MeetingChat(models.Model):
