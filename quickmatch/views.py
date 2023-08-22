@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from .models import Meeting, MeetingChat
-from .serializers import MeetingSerializer
+from .serializers import MeetingSerializer, MeetingChangeSerializer
 
 import io
 from rest_framework.parsers import JSONParser
@@ -92,17 +92,29 @@ class JoinMeeting(APIView):
                 return Response({"message": "join success!"})
 
 
-class ChangeMeeting(APIView):
+class ChangeMeetingStatus(APIView):
     # test를 위해 임시 AllowAny
     permission_classes = [AllowAny]
     def get(self, request, quickmatchId):
-        return Response({"message": "get is not developed yet."})
+        return Response({"message": "GET method is not available."})
     
     def post(self, request, quickmatchId):
         
         quickmatch = get_object_or_404(Meeting, pk=quickmatchId)
         
-        if quickmatch:
-            return Response({"message": "meeting deleted!"})
+        if quickmatch.organizer == request.user:
+            data = request.data.dict() #Querydict(수정불가)를 dict로 바꿔줌.
+            if not data.get('title', None):
+                data.update({'title': quickmatch.title})
+                print(data.get('title', 'nono'))
+                
+            serializer = MeetingChangeSerializer(data=data)
+
+            if serializer.is_valid():
+                data = serializer.data
+                serializer.update(quickmatch, data)
+                return Response({"message": "QuickMatch config are Changed."})
         
-        return Response({"message": "hahaha"})
+        else:
+            return Response({"message": "적절하지 않은 요청입니다."}, status=status.HTTP_400_BAD_REQUEST)
+            
