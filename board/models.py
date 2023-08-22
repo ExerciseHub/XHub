@@ -19,6 +19,9 @@ class Post(models.Model):
 
     likes = models.ManyToManyField(User, related_name='liked_posts', blank=True)
 
+    def __str__(self):
+        return self.gather_title
+
 
 # Comment 댓글 부분
 
@@ -29,3 +32,8 @@ class Comment(models.Model):
     like = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    likes = models.ManyToManyField(User, related_name='liked_comments', blank=True)
+
+    def __str__(self):
+        return self.content

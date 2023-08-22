@@ -14,6 +14,7 @@ class PostSerializers(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     writer = serializers.ReadOnlyField(source='writer.email')
     like = serializers.ReadOnlyField()
+    post = serializers.StringRelatedField()
     
     class Meta:
         model = Comment
