@@ -132,3 +132,27 @@ class AddFriendView(CreateAPIView):
         except ValueError:
             return Response({"message": f"{friend.email}님이 친구 목록에 추가되었습니다."}, status=status.HTTP_201_CREATED)
 
+
+class RemoveFriendView(DestroyAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserSerializer
+    lookup_field = 'friend_id'
+    queryset = User.objects.all()
+
+    def destroy(self, request, *args, **kwargs):
+        friend_id = self.kwargs['friend_id']
+
+        try:
+            friend = User.objects.get(id=friend_id)
+        except User.DoesNotExist:
+            return Response({"error": "해당 ID의 사용자를 찾을 수 없습니다."}, status=status.HTTP_404_NOT_FOUND)
+        
+        if friend == request.user:
+            return Response({"error": "자신을  친구 목록에서 제거할 수 없습니다."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if friend not in request.user.friend.all():
+            return Response({"error": f"{friend.nickname if friend.nickname else friend.email}님은 이미 친구 목록에 없습니다."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        request.user.friend.remove(friend)
+
+        return Response({"message": f"{friend.nickname if friend.nickname else friend.email}님이 친구 목록에서 제거되었습니다."}, status=status.HTTP_204_NO_CONTENT)
