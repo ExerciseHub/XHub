@@ -1,4 +1,4 @@
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView, RetrieveUpdateAPIView
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
@@ -56,6 +56,12 @@ class LikePostView(UpdateAPIView):
             post.like += 1
             post.save()
             return Response({"message": "좋아요 추가"}, status=status.HTTP_200_OK)
+
+
+class UpdatePostView(RetrieveUpdateAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializers
+    permission_classes = [IsAuthenticated]
 
 
 class IsOwner(BasePermission):
