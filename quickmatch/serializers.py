@@ -10,3 +10,6 @@ class MeetingSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         meeting = Meeting(**validated_data)
         return meeting
+    
+    def update(self, validated_data):
+        pass
