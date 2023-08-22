@@ -71,7 +71,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             for key, value in validated_data.items():
                 setattr(instance, key, value)
 
-            if password:
+            if password is not None:
                 instance.set_password(password)
 
             instance.save()
