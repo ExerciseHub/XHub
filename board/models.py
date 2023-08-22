@@ -13,9 +13,9 @@ class Post(models.Model):
     context = models.TextField()
     img = models.ImageField(blank=True, null=True)
     like = models.PositiveIntegerField(default=0)
+    public = models.BooleanField(default=True) # 공개 여부
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    public = models.BooleanField(default=True) # 공개 여부
 
 
 # Comment 댓글 부분
