@@ -17,7 +17,7 @@ class Meeting(models.Model):
     category = models.CharField(choices=CATEGORY_CHOICE, max_length=50, blank=True, null=True)
     
     GENDER_CHOICE = (("M", "남"), ("W", "여"), ("X", "무관"))
-    gender_limit = models.CharField(choices=GENDER_CHOICE, max_length=50)
+    gender_limit = models.CharField(choices=GENDER_CHOICE, max_length=50, default="X")
     
     STATUS_CHOICE = (("모집중", "모집중"), ("모집완료", "모집완료"), ("모집종료", "모집종료"), ("취소", "취소"))
     status = models.CharField(choices=STATUS_CHOICE, max_length=50, default="모집중")
