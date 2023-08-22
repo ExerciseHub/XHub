@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import PostCreateView
+from .views import PostCreateView, PostDetailView, PostDeleteView
 
 app_name = 'board'
 
@@ -13,10 +13,11 @@ urlpatterns = [
 
     # 게시글 상세보기
     # path('<int:board_id>/detail/', 기능, name='detail'),
+    path('<int:pk>/', PostDetailView.as_view(), name='detail'),
 
     # 게시글 삭제
     # path('<int:board_id>/delete/', 기능, name='delete'),
-
+    path('<int:pk>/delete/', PostDeleteView.as_view(), name='delete'),
     # 게시글 수정
     # path('<int:board_id>/detail/', 기능, name='update'),
 
@@ -28,6 +29,7 @@ urlpatterns = [
 
     # 댓글 삭제
     # path('<int:board_id>/<int:comment_id>/delete/', 기능, name='cm-delete'),
+
 
     # 댓글 수정
     # path('<int:board_id>/<int:comment_id>/edit', 기능, name='cm-edit'),
