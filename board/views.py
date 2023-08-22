@@ -106,3 +106,25 @@ class CommentDeleteView(DestroyAPIView):
     serializer_class = CommentSerializer
     permission_classes = (IsAuthenticated, IsOwner)
     lookup_field = 'id'
+
+
+class LikeCommentView(UpdateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated,]
+    lookup_field = 'id'
+
+    def update(self, request, *args, **kwargs):
+        comment = self.get_object()
+
+        # 이미 좋아요를 눌렀다면, 좋아요 취소
+        if comment.likes.filter(id=request.user.id).exists():
+            comment.likes.remove(request.user)
+            comment.like -= 1
+            comment.save()
+            return Response({"message": "좋아요 취소"}, status=status.HTTP_200_OK)
+        else:
+            comment.likes.add(request.user)
+            comment.like += 1
+            comment.save()
+            return Response({"message": "좋아요 추가"}, status=status.HTTP_200_OK)
