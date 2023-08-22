@@ -1,11 +1,11 @@
 from django.urls import path
-from .views import PostCreateView
+from .views import PostCreateView, PostListView
 
 app_name = 'board'
 
 urlpatterns = [
     # 게시글 조회(list)
-    # path('', 기능, name='list'),
+    path('', PostListView.as_view(), name='list'),
 
     # 게시글 생성
     # path('write/', 기능, name='write'),
