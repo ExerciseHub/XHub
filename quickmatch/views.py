@@ -7,11 +7,13 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from .models import Meeting, MeetingChat
+from .models import Meeting, MeetingMembers, MeetingChat
 from .serializers import MeetingSerializer, MeetingChangeSerializer
 
 import io
 from rest_framework.parsers import JSONParser
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 
 class CreateMeeting(APIView):
@@ -72,8 +74,7 @@ class DeleteMeeting(APIView):
 
 
 class JoinMeeting(APIView):
-    # test를 위해 임시 AllowAny
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     
     def get(self, request, quickmatchId):
         return Response({"message": "GET method is not available."})
@@ -89,14 +90,15 @@ class JoinMeeting(APIView):
                 return Response({"message": "the Meeting is full. You cannot join to this QuickMatch."})
             else:
                 quickmatch.add_participant()
-                # TODO meeting member 추가 예정
                 quickmatch.save()
+                
+                # meeting member 추가
+                MeetingMembers.objects.create(quickmatch=quickmatch, attendant=request.user)
                 return Response({"message": "join success!"})
 
 
 class ChangeMeetingStatus(APIView):
-    # test를 위해 임시 AllowAny
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     def get(self, request, quickmatchId):
         return Response({"message": "GET method is not available."})
     
@@ -119,6 +121,7 @@ class ChangeMeetingStatus(APIView):
         
         else:
             return Response({"message": "적절하지 않은 요청입니다."}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class MeetingSearchView(ListAPIView):
