@@ -1,8 +1,10 @@
 from django.shortcuts import render, get_object_or_404
+from django.db.models import Q
 
+from rest_framework import status, filters
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
-from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from .models import Meeting, MeetingMembers, MeetingChat
@@ -120,25 +122,32 @@ class ChangeMeetingStatus(APIView):
         else:
             return Response({"message": "적절하지 않은 요청입니다."}, status=status.HTTP_400_BAD_REQUEST)
 
+class MeetingSearchView(ListAPIView):
+    serializer_class = MeetingSerializer
+    permission_classes = [AllowAny,]
 
-class Test(APIView):
-    permission_classes = [AllowAny]
-    def get(self, request):
-        pass
-    
-    def post(self, request, quickmatchId):
-        quickmatch = get_object_or_404(Meeting, pk=quickmatchId)
-        user = User.objects.get(pk=2)
-        print(user)
+    def get_queryset(self):
+        queryset = Meeting.objects.all()
+
+        category = self.request.query_params.get('category', None)
+        status = self.request.query_params.get('status', None)
+
+        if category:
+            queryset = queryset.filter(category=category)
         
+        if status:
+            queryset = queryset.fliter(status=status)
+
+        # GET 파라미터로부터 검색어를 가져옵니다.
+        query = self.request.GET.get('search', '')
         
+        # 검색어를 공백 기준으로 분리합니다.
+        terms = query.split()
+
+        # 각 단어에 대한 Q 객체를 생성합니다.
+        q_objects = Q()
+
+        for term in terms:
+            q_objects |= Q(title__icontains=term) | Q(location__icontains=term)
         
-        print(MeetingMembers.objects.all())
-        print(MeetingMembers.objects.filter(quickmatch=quickmatch))
-        print('---')
-        print(quickmatch.meeting_member.all())
-        print(len(quickmatch.meeting_member.all()))
-        print(quickmatch.title)
-        # for i in quickmatch.meeting_member.all():
-        #     print(i)
-        return Response({"message": "haha ha"})
+        return queryset.filter(q_objects)
