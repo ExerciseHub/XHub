@@ -24,8 +24,8 @@ class Meeting(models.Model):
 
     location = models.CharField(max_length=255)  # 고민
     # 참여자
-    # meeting_member = models.ManyToManyField(User, blank=True, null=True)  # 고민
-    meeting_member = models.CharField(max_length=255, blank=True, null=True)
+    meeting_member = models.ManyToManyField(User, through='MeetingMembers', related_name='quickmatches', blank=True)  # 고민
+    # meeting_member = models.CharField(max_length=255, blank=True, null=True)
 
     max_participants = models.PositiveIntegerField()
     current_participants = models.PositiveIntegerField(validators=[MinValueValidator(1)], default=1)
@@ -42,8 +42,11 @@ class Meeting(models.Model):
         if self.current_participants > 1:
             self.current_participants -= 1
             self.save()
-    
-    
+
+
+class MeetingMembers(models.Model):
+    quickmatch = models.ForeignKey('Meeting', on_delete=models.CASCADE)
+    attendant = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
 
 class MeetingChat(models.Model):
