@@ -122,6 +122,8 @@ class ChangeMeetingStatus(APIView):
         else:
             return Response({"message": "적절하지 않은 요청입니다."}, status=status.HTTP_400_BAD_REQUEST)
 
+
+
 class MeetingSearchView(ListAPIView):
     serializer_class = MeetingSerializer
     permission_classes = [AllowAny,]
