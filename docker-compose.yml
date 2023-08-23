@@ -1,0 +1,40 @@
+version: '3'  # Docker Compose의 버전을 지정합니다.
+
+services:  # 서비스 목록을 정의합니다.
+  django:  # Django 애플리케이션 서비스를 정의합니다.
+    build:  # 이미지 빌드 정보를 지정합니다.
+      context: .  # 빌드 컨텍스트로 현재 디렉토리를 사용합니다.
+      dockerfile: Dockerfile  # 사용할 Dockerfile을 지정합니다.
+    ports:
+      - "8000:8000"  # 호스트의 8000 포트와 컨테이너의 8000 포트를 연결합니다.
+    environment:  # 환경 변수를 설정합니다.
+      DJANGO_SETTINGS_MODULE: core.settings
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+    depends_on:
+      - db  # db 서비스가 시작된 후에 django 서비스를 시작합니다.
+    networks:
+      - main_network  # main_network에 연결합니다.
+    volumes:
+      - .:/app  # 현재 디렉토리를 컨테이너의 /app 디렉토리에 마운트합니다.
+
+  db:  # 데이터베이스 서비스를 정의합니다.
+    image: postgres:15.4-alpine3.18  # 사용할 이미지를 지정합니다.
+    environment:  # 환경 변수를 설정합니다.
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data  # 데이터를 영구적으로 저장하기 위해 볼륨을 마운트합니다.
+    networks:
+      - main_network  # main_network에 연결합니다.
+
+networks:  # 네트워크를 정의합니다.
+  main_network:
+    driver: bridge  # 브리지 드라이버를 사용하는 네트워크를 생성합니다.
+
+volumes:  # 볼륨을 정의합니다.
+  pgdata:  # pgdata 볼륨을 생성합니다.
