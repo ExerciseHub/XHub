@@ -17,3 +17,4 @@ typing_extensions==4.7.1
 tzdata==2023.3
 psycopg2==2.9.7
 drf-yasg==1.21.7
+gunicorn==21.2.0
