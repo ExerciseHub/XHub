@@ -1,14 +1,12 @@
 # 공식 Python 런타임을 기반 이미지로 사용합니다.
-FROM alpine:3.18
+FROM python:3.11.4-alpine3.18
 
 # 환경 변수 설정
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-ENV DJANGO_SETTINGS_MODULE=core.settings
 
 # Python 및 PostgreSQL에 필요한 시스템 패키지를 설치합니다.
 RUN apk update \
-    && apk add --no-cache python3 py3-pip python3-dev \
     && apk add --no-cache postgresql-dev gcc musl-dev jpeg-dev zlib-dev \
     && python3 -m ensurepip \
     && pip3 install --no-cache --upgrade pip setuptools
