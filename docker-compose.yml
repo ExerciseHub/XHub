@@ -16,8 +16,6 @@ services:  # 서비스 목록을 정의합니다.
       DB_PORT: ${DB_PORT}
     depends_on:
       - db  # db 서비스가 시작된 후에 django 서비스를 시작합니다.
-    # networks:
-    #   - main_network  # main_network에 연결합니다.
     volumes:
       - .:/app  # 현재 디렉토리를 컨테이너의 /app 디렉토리에 마운트합니다.
     hostname: django
@@ -30,8 +28,6 @@ services:  # 서비스 목록을 정의합니다.
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql/data
-    # networks:
-    #   - main_network
 
   nginx:
     image: nginx:latest # 최신 버전의 nginx 이미지를 사용합니다.
@@ -42,10 +38,6 @@ services:  # 서비스 목록을 정의합니다.
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - django # django 서비스가 시작된 후에 nginx 서비스를 시작합니다.
-
-# networks:  # 네트워크를 정의합니다.
-#   main_network:
-#     driver: bridge  # 브리지 드라이버를 사용하는 네트워크를 생성합니다.
 
 volumes:  # 볼륨을 정의합니다.
   pgdata:  # pgdata 볼륨을 생성합니다.
