@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from .models import Meeting, MeetingChat
-from .serializers import MeetingSerializer
+from .serializers import MeetingSerializer, MeetingChangeSerializer
 
 import io
 from rest_framework.parsers import JSONParser
@@ -41,6 +41,9 @@ class CreateMeeting(APIView):
                 
             if not data.get('status', None):
                 quickmatch.status = status_list[0]
+                
+            if not data.get('max_participants', None):
+                quickmatch.max_participants = 10
 
             quickmatch.save() # 오브젝트 저장
             return Response({"message": "create sucess!", "meeting": repr(quickmatch)}, status=status.HTTP_200_OK)
@@ -64,35 +67,54 @@ class DeleteMeeting(APIView):
             return Response(result, status=status.HTTP_200_OK)
         
         return Response({"message": "Meeting is not exists"}, status=status.HTTP_404_NOT_FOUND)
-    
+
 
 class JoinMeeting(APIView):
     # test를 위해 임시 AllowAny
     permission_classes = [AllowAny]
+    
     def get(self, request, quickmatchId):
-        return Response({"message": "get is not developed yet."})
+        return Response({"message": "GET method is not available."})
     
     def post(self, request, quickmatchId):
         
         quickmatch = get_object_or_404(Meeting, pk=quickmatchId)
         
-        if quickmatch:
-            return Response({"message": "meeting deleted!"})
-        
-        return Response({"message": "hahaha"})
-    
+        if quickmatch.organizer == request.user:
+            return Response({"message": "적절하지 않은 요청입니다."}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            if quickmatch.current_participants == quickmatch.max_participants:
+                return Response({"message": "the Meeting is full. You cannot join to this QuickMatch."})
+            else:
+                quickmatch.add_participant()
+                # TODO meeting member 추가 예정
+                quickmatch.save()
+                return Response({"message": "join success!"})
 
-class ChangeMeeting(APIView):
+
+class ChangeMeetingStatus(APIView):
     # test를 위해 임시 AllowAny
     permission_classes = [AllowAny]
     def get(self, request, quickmatchId):
-        return Response({"message": "get is not developed yet."})
+        return Response({"message": "GET method is not available."})
     
     def post(self, request, quickmatchId):
         
         quickmatch = get_object_or_404(Meeting, pk=quickmatchId)
         
-        if quickmatch:
-            return Response({"message": "meeting deleted!"})
+        if quickmatch.organizer == request.user:
+            data = request.data.dict() #Querydict(수정불가)를 dict로 바꿔줌.
+            if not data.get('title', None):
+                data.update({'title': quickmatch.title})
+                print(data.get('title', 'nono'))
+                
+            serializer = MeetingChangeSerializer(data=data)
+
+            if serializer.is_valid():
+                data = serializer.data
+                serializer.update(quickmatch, data)
+                return Response({"message": "QuickMatch config are Changed."})
         
-        return Response({"message": "hahaha"})
+        else:
+            return Response({"message": "적절하지 않은 요청입니다."}, status=status.HTTP_400_BAD_REQUEST)
+            

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CreateMeeting, DeleteMeeting, JoinMeeting, ChangeMeeting
+from .views import CreateMeeting, DeleteMeeting, JoinMeeting, ChangeMeetingStatus
 
 app_name = 'quickmatch'
 
@@ -14,5 +14,5 @@ urlpatterns = [
     path('join/<int:quickmatchId>/', JoinMeeting.as_view(), name='join'),
 
     # 모임 상태 변경
-    path('<int:quickmatchId>/status/', ChangeMeeting.as_view(), name='status'),
+    path('<int:quickmatchId>/status/', ChangeMeetingStatus.as_view(), name='status'),
 ]
