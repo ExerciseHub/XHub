@@ -33,7 +33,7 @@ services:  # 서비스 목록을 정의합니다.
       - pgdata:/var/lib/postgresql/data
 
   nginx:
-    image: nginx:latest # 최신 버전의 nginx 이미지를 사용합니다.
+    image: nginx:1.25.2 # 최신 버전의 nginx 이미지를 사용합니다.
     ports:
       - "80:80" # 호스트의 80 포트와 컨테이너의 80 포트를 맵핑합니다.
     volumes:
