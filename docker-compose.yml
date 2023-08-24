@@ -32,6 +32,32 @@ services:  # 서비스 목록을 정의합니다.
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  redis:
+    image: redis:latest
+
+  daphne:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      DJANGO_SETTINGS_MODULE: core.settings
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - .:/app
+      - ./staticfiles:/staticfiles
+    hostname: daphne
+    command: ["daphne", "-u", "/tmp/daphne.sock", "core.asgi:application"]
+
+
   nginx:
     image: nginx:1.25.2 # 최신 버전의 nginx 이미지를 사용합니다.
     ports:
@@ -43,6 +69,7 @@ services:  # 서비스 목록을 정의합니다.
       - ./staticfiles:/staticfiles
     depends_on:
       - django # django 서비스가 시작된 후에 nginx 서비스를 시작합니다.
+      - daphne
 
 volumes:  # 볼륨을 정의합니다.
   pgdata:  # pgdata 볼륨을 생성합니다.
