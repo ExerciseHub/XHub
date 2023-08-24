@@ -49,7 +49,7 @@ AUTH_USER_MODEL = 'player.User'
 
 
 # 라우팅
-ASGI_APPLICATION = "xgub.asgi.application"
+ASGI_APPLICATION = "core.asgi.application"
 
 
 # Application definition
