@@ -24,7 +24,7 @@ services:  # 서비스 목록을 정의합니다.
     hostname: django
 
   db:
-    image: postgres:latest
+    image: postgres:15.4-alpine3.18
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
