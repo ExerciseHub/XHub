@@ -48,9 +48,14 @@ AUTHENTICATION_BACKENDS = (
 AUTH_USER_MODEL = 'player.User'
 
 
+# 라우팅
+ASGI_APPLICATION = "core.asgi.application"
+
+
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
