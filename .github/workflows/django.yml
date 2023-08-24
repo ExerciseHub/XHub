@@ -22,7 +22,7 @@ jobs:
       run: |
         echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> $GITHUB_ENV
         echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
-        echo "DEBUG=${{ secrets.DEBUG }}" >> $GITHUB_ENV
+        echo "DEBUG=${{ secrets.DJANGO_DEBUG }}" >> $GITHUB_ENV
         echo "DB_ENGINE=${{ secrets.DB_ENGINE }}" >> $GITHUB_ENV
         echo "DB_NAME=${{ secrets.DB_NAME }}" >> $GITHUB_ENV
         echo "DB_USER=${{ secrets.DB_USER }}" >> $GITHUB_ENV
