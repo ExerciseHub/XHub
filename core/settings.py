@@ -48,6 +48,20 @@ AUTHENTICATION_BACKENDS = (
 AUTH_USER_MODEL = 'player.User'
 
 
+# 라우팅
+ASGI_APPLICATION = "core.asgi.application"
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('redis', 6379)],
+        },
+    },
+}
+
+
+
 # Application definition
 
 INSTALLED_APPS = [
