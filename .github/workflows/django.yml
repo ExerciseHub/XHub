@@ -28,9 +28,12 @@ jobs:
 
     # GitHub Secrets에서 환경 변수를 설정합니다.
     - name: Set environment variables from GitHub Secrets
+      env:
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       run: |
-        echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> $GITHUB_ENV
-        echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> $GITHUB_ENV
+        echo "SECRET_KEY=${SECRET_KEY}" >> $GITHUB_ENV
+        echo "DB_PASSWORD=${DB_PASSWORD}" >> $GITHUB_ENV
     
     # 지정된 Python 버전을 설정합니다.
     - name: Set up Python ${{ matrix.python-version }}
