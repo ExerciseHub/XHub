@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Meeting, MeetingChat
+from .models import Meeting, MeetingMessage, MeetingRoom
 
 class MeetingSerializer(serializers.ModelSerializer):
     
@@ -32,3 +32,17 @@ class MeetingChangeSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+
+class MeetingMessageSerializer(serializers.ModelSerializer):
+    class Meta():
+        model = MeetingMessage
+        fields = '__all__'
+        depth = 1
+    
+    def get_create_at_formatted(self, obj):
+        return obj.created_at.strftime("%d-%m-%y %H:%M:%S")
+        
+
+class MeetingRoomSerializer(serializers.ModelSerializer):
+    pass

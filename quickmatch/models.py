@@ -49,7 +49,18 @@ class MeetingMembers(models.Model):
     attendant = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
 
-class MeetingChat(models.Model):
-    role = models.ForeignKey("Meeting", on_delete=models.CASCADE)
-    content = models.CharField(max_length=255)  # TextFields 고려
+class MeetingRoom(models.Model):
+    name = models.CharField(max_length=255)
+    meeting = models.OneToOneField('Meeting', on_delete=models.CASCADE)
+    host = models.ForeignKey(User, on_delete=models.CASCADE, related_name="rooms")
+    current_users = models.ManyToManyField(User, related_name="current_rooms", blank=True)
+
+
+class MeetingMessage(models.Model):
+    room = models.ForeignKey("MeetingRoom", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField(max_length=500)
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.rooom}-message({self.user}) : {self.text}"

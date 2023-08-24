@@ -7,7 +7,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from .models import Meeting, MeetingMembers, MeetingChat
+from .models import Meeting, MeetingMembers, MeetingMessage
 from .serializers import MeetingSerializer, MeetingChangeSerializer
 
 import io
