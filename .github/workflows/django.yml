@@ -31,9 +31,11 @@ jobs:
       env:
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
         DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        DJANGO_DEBUG: ${{ secrets.DJANGO_DEBUG }}
       run: |
         echo "SECRET_KEY=${SECRET_KEY}" >> $GITHUB_ENV
         echo "DB_PASSWORD=${DB_PASSWORD}" >> $GITHUB_ENV
+        echo "DJANGO_DEBUG=${DJANGO_DEBUG}" >> $GITHUB_ENV
     
     # 지정된 Python 버전을 설정합니다.
     - name: Set up Python ${{ matrix.python-version }}
