@@ -23,8 +23,15 @@ jobs:
       run: docker pull starmireu/xhub-django:latest
 
     - name: Start containers using Docker Compose
-      run: |
-        DB_NAME=${{ secrets.DB_NAME }} DB_USER=${{ secrets.DB_USER }} DB_PASSWORD=${{ secrets.DB_PASSWORD }} DB_HOST=${{ secrets.DB_HOST }} DB_PORT=${{ secrets.DB_PORT }} SECRET_KEY=${{ secrets.SECRET_KEY }} DJANGO_DEBUG=${{ secrets.DJANGO_DEBUG }} docker-compose up -d
+      env:
+        DB_NAME: ${{ secrets.DB_NAME }}
+        DB_USER: ${{ secrets.DB_USER }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        DB_HOST: ${{ secrets.DB_HOST }}
+        DB_PORT: ${{ secrets.DB_PORT }}
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        DJANGO_DEBUG: ${{ secrets.DJANGO_DEBUG }}
+      run: docker-compose up -d
 
     - name: Print PostgreSQL logs
       run: docker logs xhub_db_1
