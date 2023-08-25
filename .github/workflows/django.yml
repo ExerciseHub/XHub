@@ -15,7 +15,7 @@ jobs:
         database-user:
           - postgres
         database-host:
-          - localhost
+          - db
         database-port:
           - 5432
 
