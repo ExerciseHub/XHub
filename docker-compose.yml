@@ -29,6 +29,7 @@ services:  # Define services list
       POSTGRES_DB: xhubdb
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: kid14128
+      POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
       - pgdata:/var/lib/postgresql/data
 
