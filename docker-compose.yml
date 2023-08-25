@@ -1,48 +1,48 @@
-version: '3'  # Docker Compose의 버전을 지정합니다.
+version: '3'  # Docker Compose version
 
-services:  # 서비스 목록을 정의합니다.
-  django:  # Django 애플리케이션 서비스를 정의합니다.
-    build:  # 이미지 빌드 정보를 지정합니다.
-      context: .  # 빌드 컨텍스트로 현재 디렉토리를 사용합니다.
-      dockerfile: Dockerfile  # 사용할 Dockerfile을 지정합니다.
+services:  # Define services list
+  django:  # Define Django application service
+    build:  # Specify image build information
+      context: .  # Use the current directory as the build context
+      dockerfile: Dockerfile  # Specify the Dockerfile to use
     ports:
-      - "8000:8000"  # 호스트의 8000 포트와 컨테이너의 8000 포트를 연결합니다.
-    environment:  # 환경 변수를 설정합니다.
+      - "8000:8000"  # Connect the host's port 8000 to the container's port 8000
+    environment:  # Set environment variables
       DJANGO_SETTINGS_MODULE: core.settings
-      DB_NAME: ${DB_NAME}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
+      DB_NAME: xhubdb
+      DB_USER: postgres
+      DB_PASSWORD: kid14128
+      DB_HOST: db
+      DB_PORT: 5432
     depends_on:
-      - db  # db 서비스가 시작된 후에 django 서비스를 시작합니다.
+      - db  # Start the django service after the db service starts
     volumes:
-      # 현재 디렉토리를 컨테이너의 /app 디렉토리에 마운트합니다.
+      # Mount the current directory to the container's /app directory
       - .:/app  
-      # 본 장고의 정적 파일 경로를 설정합니다.
+      # Set the static file path of this Django
       - ./staticfiles:/staticfiles 
     hostname: django
 
   db:
     image: postgres:latest
     environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: xhubdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: kid14128
     volumes:
       - pgdata:/var/lib/postgresql/data
 
   nginx:
-    image: nginx:1.25.2 # 최신 버전의 nginx 이미지를 사용합니다.
+    image: nginx:1.25.2 # Use the latest version of the nginx image
     ports:
-      - "80:80" # 호스트의 80 포트와 컨테이너의 80 포트를 맵핑합니다.
+      - "80:80" # Map the host's port 80 to the container's port 80
     volumes:
-      # 호스트의 ./nginx/nginx.conf 파일을 컨테이너의 /etc/nginx/nginx.conf 위치에 읽기 전용으로 마운트합니다.
+      # Mount the host's ./nginx/nginx.conf file to the container's /etc/nginx/nginx.conf location as read-only
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      # 본 nginx 의 정적 파일 경로를 설정합니다.
+      # Set the static file path of this nginx
       - ./staticfiles:/staticfiles
     depends_on:
-      - django # django 서비스가 시작된 후에 nginx 서비스를 시작합니다.
+      - django # Start the nginx service after the django service starts
 
-volumes:  # 볼륨을 정의합니다.
-  pgdata:  # pgdata 볼륨을 생성합니다.
+volumes:  # Define volumes
+  pgdata:  # Create the pgdata volume
