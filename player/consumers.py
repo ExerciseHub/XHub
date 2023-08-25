@@ -1,64 +1,56 @@
 import json
-from channels.db import database_sync_to_async
-from djangochannelsrestframework.generics import GenericAsyncAPIConsumer
-from djangochannelsrestframework.observer import model_observer
-from djangochannelsrestframework.observer.generics import ObserverModelInstanceMixin, action
-
-from rest_framework_simplejwt.tokens import UntypedToken
-from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
+from channels.generic.websocket import AsyncWebsocketConsumer
+from asgiref.sync import sync_to_async
+from .models import DirectMessage, DMRoom
 
 
-from .models import DirectMessage, DMRoom, User
-from .serializers import MessageSerializer, RoomSerializer
-
-class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
-    queryset = DMRoom.objects.all()
-    serializer_class = RoomSerializer
-    lookup_field = "pk"
-
+class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        self.room_id = None  # 초기에는 방의 ID를 None으로 설정
-        await self.accept()  # 연결 허용
+        self.room_name = self.scope['url_route']['kwargs']['room_id']
+        self.room_group_name = f'chat_{self.room_name}'
 
-    @action()
-    async def create_message(self, message, **kwargs):
-        if self.room_id is None:
-            # 방의 ID가 설정되지 않은 경우 메시지를 반환하고 종료
-            return {"error": "Room ID not set."}
-
-        room: DMRoom = await self.get_room(pk=self.room_id)
-        await database_sync_to_async(DirectMessage.objects.create)(
-            room=room,
-            user=self.scope["user"],
-            text=message
+        await self.channel_layer.group_add(
+            self.room_group_name,
+            self.channel_name
         )
 
-    @action()
-    async def subscribe_to_messages_in_room(self, pk, request_id, **kwargs):
-        self.room_id = pk  # 방의 ID를 저장
-        await self.message_activity.subscribe(room=pk, request_id=request_id)
+        await self.accept()
 
-    @model_observer(DirectMessage)
-    async def message_activity(
-        self,
-        message,
-        observer=None,
-        subscribing_request_ids = [],
-        **kwargs
-    ):
-        for request_id in subscribing_request_ids:
-            message_body = dict(request_id=request_id)
-            message_body.update(message)
-            await self.send_json(message_body)
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(
+            self.room_group_name,
+            self.channel_name
+        )
 
-    @message_activity.groups_for_signal
-    def message_activity(self, instance: DirectMessage, **kwargs):
-        yield 'room__{instance.room_id}'
+    async def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        message = text_data_json['message']
 
-    @message_activity.serializer
-    def message_activity(self, instance:DirectMessage, action, **kwargs):
-        return dict(data=MessageSerializer(instance).data, action=action.value, pk=instance.pk)
+        # Save the message
+        await self.save_message(message)
 
-    @database_sync_to_async
-    def get_room(self, pk: int) -> DMRoom:
-        return DMRoom.objects.get(pk=pk)
+        # Send message to room group
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'chat_message',
+                'message': message,
+                'user': self.scope['user'].instance.email
+            }
+        )
+
+    async def chat_message(self, event):
+        message = event['message']
+        user = event['user'].instance
+
+        # Send message to WebSocket
+        await self.send(text_data=json.dumps({
+            'message': message,
+            'user': user
+        }))
+
+    @sync_to_async
+    def save_message(self, message):
+        user = self.scope['user'].instance
+        room = DMRoom.objects.get(id=self.room_name)
+        DirectMessage.objects.create(user=user, room=room, content=message)

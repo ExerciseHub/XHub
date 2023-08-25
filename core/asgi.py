@@ -13,5 +13,8 @@ import player.routing
 
 application = ProtocolTypeRouter({
     "http": asgi_app,
-    "websocket": URLRouter(player.routing.websocket_urlpatterns)
+    "websocket": AuthMiddlewareStack(
+        URLRouter(
+            player.routing.websocket_urlpatterns)
+    )
 })
