@@ -31,7 +31,7 @@ jobs:
 
     - name: Run tests
       run: |
-        docker exec xhub-django-1 python manage.py test
+        docker exec xhub_django_1 python manage.py test
 
     - name: Stop and remove containers
       run: docker-compose down
