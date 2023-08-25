@@ -25,7 +25,7 @@ services:  # Define services list
     deploy:
       resources:
         limits:
-          memory: 2g
+          memory: 1g
 
   db:
     image: postgres:latest
@@ -39,7 +39,7 @@ services:  # Define services list
     deploy:
       resources:
         limits:
-          memory: 2g
+          memory: 1g
 
   nginx:
     image: nginx:1.25.2 # Use the latest version of the nginx image
