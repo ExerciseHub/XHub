@@ -22,6 +22,10 @@ services:  # Define services list
       # Set the static file path of this Django
       - ./staticfiles:/staticfiles 
     hostname: django
+    deploy:
+      resources:
+        limits:
+          memory: 1g
 
   db:
     image: postgres:latest
@@ -32,6 +36,10 @@ services:  # Define services list
       POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
       - pgdata:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          memory: 1g
 
   nginx:
     image: nginx:1.25.2 # Use the latest version of the nginx image
