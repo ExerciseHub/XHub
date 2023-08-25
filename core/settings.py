@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 from decouple import config
+# JWT 토큰 만료 시간 설정
+from datetime import timedelta
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -65,7 +67,16 @@ INSTALLED_APPS = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+        # 'rest_framework.permissions.IsAuthenticated', # 인증된 사용자만 접근
+        # 'rest_framework.permissions.IsAdminUser', # 관리자만 접근
+        # 'rest_framework.permissions.AllowAny', # 누구나 접근
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        # 'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny', # 누구나 접근
+    ),
 }
 
 MIDDLEWARE = [
@@ -105,11 +116,11 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': '여기에DB이름', # database 이름 (서버말고)
-        'USER': 'postgres', # server User 이름
-        'PASSWORD': '여기에암호', # server User 암호
-        'HOST': 'localhost', # localhost 로 해두면 로컬 내 postgres DB로 연결
-        'port': '5432', # postgres DB의 포트넘버 기본값
+        'NAME': config('DB_NAME'), # database 이름 (서버말고)
+        'USER': config('DB_USER'), # server User 이름
+        'PASSWORD': config('DB_PASSWORD'), # server User 암호
+        'HOST': config('DB_HOST'), # localhost 로 해두면 로컬 내 postgres DB로 연결
+        'port': config('DB_PORT'), # postgres DB의 포트넘버 기본값
     }
 }
 
@@ -154,3 +165,22 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# JWT 토큰 만료 시간 설정
+
+SIMPLE_JWT = {
+    'ALGORITHM': 'HS256',
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': False,
+    'VERIFYING_KEY': None,
+    'VALIDATING_KEY': None,
+    'SIGNING_KEY': SECRET_KEY,
+    'VERIFY_SIGNATURE': True,
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
+}
