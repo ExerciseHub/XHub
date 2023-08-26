@@ -45,7 +45,7 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_HOST: postgres
           DB_PORT: ${{ secrets.DB_PORT }}
-          DJANGO_SETTINGS_MODULE: core/settings
+          DJANGO_SETTINGS_MODULE: XHub.core.settings
 
       # - name: Lint with flake8
       #   run: |
