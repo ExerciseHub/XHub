@@ -138,7 +138,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': config('DB_NAME'), # database 이름 (서버말고)
-        'USER': config('DBdecouple_USER'), # server User 이름
+        'USER': config('DB_USER'), # server User 이름
         'PASSWORD': config('DB_PASSWORD'), # server User 암호
         'HOST': config('DB_HOST'), # localhost 로 해두면 로컬 내 postgres DB로 연결
         'port': config('DB_PORT'), # postgres DB의 포트넘버 기본값
