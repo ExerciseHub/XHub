@@ -28,11 +28,14 @@ jobs:
       #   run: |
       #     pip install flake8
       #     flake8
-      - name: Coverage report
-        run: |
-          pip install coverage
-          coverage run manage.py test
-          coverage report
+      # - name: Coverage report
+      #   run: |
+      #     pip install coverage
+      #     coverage run manage.py test
+      #     coverage report
+      #   env:
+      #     SECRET_KEY: ${{ secrets.SECRET_KEY }}
+
       - name: Django Tests
         run: |
           python manage.py test
