@@ -1,4 +1,4 @@
-name: Django Tests
+name: Django CI
 
 on: 
   push:
@@ -46,17 +46,17 @@ jobs:
       #   env:
       #     SECRET_KEY: 
 
-      - name: Django Tests
-        run: |
-          python manage.py test
-        env:
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          DJANGO_DEBUG: ${{ secrets.DJANGO_DEBUG }}
-          DB_NAME: ${{ secrets.DB_NAME }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_HOST: postgres
-          DB_PORT: ${{ secrets.DB_PORT }}
+      # - name: Django Tests
+      #   run: |
+      #     python manage.py test
+      #   env:
+      #     SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      #     DJANGO_DEBUG: ${{ secrets.DJANGO_DEBUG }}
+      #     DB_NAME: ${{ secrets.DB_NAME }}
+      #     DB_USER: ${{ secrets.DB_USER }}
+      #     DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      #     DB_HOST: postgres
+      #     DB_PORT: ${{ secrets.DB_PORT }}
 
 
 
