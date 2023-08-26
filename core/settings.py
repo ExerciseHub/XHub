@@ -134,6 +134,8 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+'USER': config('DBdecouple_USER', default='postgres')
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
