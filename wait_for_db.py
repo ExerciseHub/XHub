@@ -1,3 +1,15 @@
+import os
+import sys
+from pathlib import Path
+
+# Add the project directory to the sys.path
+project_directory = Path(__file__).resolve().parent
+if str(project_directory) not in sys.path:
+    sys.path.insert(0, str(project_directory))
+
+# Set Django settings module environment variable
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'XHub.core.settings')
+
 import django
 django.setup()
 
