@@ -34,13 +34,14 @@ jobs:
       #     coverage run manage.py test
       #     coverage report
       #   env:
-      #     SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      #     SECRET_KEY: 
 
       - name: Django Tests
         run: |
           python manage.py test
         env:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          DJANGO_DEBUG: ${{ secrets.DJANGO_DEBUG }}
 
 
 
