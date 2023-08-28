@@ -59,7 +59,6 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []  # 이제 기본적으로 이메일이 필요하므로 이 목록에서 제거
 
 
-<<<<<<< HEAD
 class DMRoom(models.Model):
     name = models.CharField(max_length=255, null=True, blank=True, unique=True)
     host = models.ForeignKey("User", on_delete=models.CASCADE, related_name="room")
@@ -77,9 +76,3 @@ class DirectMessage(models.Model):
 
     def __str__(self):
         return f"Message({self.user} {self.room})"
-=======
-class DirectChatting(models.Model):
-    role = models.ForeignKey("User", on_delete=models.CASCADE)
-    content = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
->>>>>>> parent of 66bd356 (1:1 실시간 채팅 설정(Daphne, nginx, docker-compose))

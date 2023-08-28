@@ -1,56 +1,52 @@
-import json
-from channels.generic.websocket import AsyncWebsocketConsumer
-from asgiref.sync import sync_to_async
-from .models import DirectMessage, DMRoom
+from djangochannelsrestframework import permissions
+from djangochannelsrestframework.decorators import action
+from djangochannelsrestframework.generics import GenericAsyncAPIConsumer
 
+from channels.db import database_sync_to_async
 
-class ChatConsumer(AsyncWebsocketConsumer):
-    async def connect(self):
-        self.room_name = self.scope['url_route']['kwargs']['room_id']
-        self.room_group_name = f'chat_{self.room_name}'
+from . import models
+from . import serializers
 
-        await self.channel_layer.group_add(
-            self.room_group_name,
-            self.channel_name
-        )
+class ChatConsumer(GenericAsyncAPIConsumer):
+    queryset = models.DirectMessage.objects.all()
+    serializer_class = serializers.MessageSerializer
+    permission_classes = (permissions.IsAuthenticated,)
 
-        await self.accept()
+    @action()
+    async def create_room(self, name, **kwargs):
+        """
+        채팅방 생성
+        """
+        room = models.DMRoom(name=name)
+        room.save()
+        room.current_users.add(self.scope['user'])
+        return {'room_id': room.id}, 200
 
-    async def disconnect(self, close_code):
-        await self.channel_layer.group_discard(
-            self.room_group_name,
-            self.channel_name
-        )
+    @action()
+    async def join_room(self, room_id, **kwargs):
+        """
+        채팅방 참가 (만약 이전 대화가 있다면 대화내용 확인)
+        """
+        room = await database_sync_to_async(models.DMRoom.objects.get)(pk=room_id)
+        room.current_users.add(self.scope['user'])
+        messages = models.DirectMessage.objects.filter(room=room)
+        return serializers.MessageSerializer(messages, many=True).data, 200
 
-    async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        message = text_data_json['message']
+    @action()
+    async def send_message(self, room_id, content, **kwargs):
+        """
+        실시간 채팅
+        """
+        room = await database_sync_to_async(models.DMRoom.objects.get)(pk=room_id)
+        message = models.DirectMessage(room=room, sender=self.scope['user'], content=content)
+        message.save()
+        return serializers.MessageSerializer(message).data, 200
 
-        # Save the message
-        await self.save_message(message)
-
-        # Send message to room group
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'chat_message',
-                'message': message,
-                'user': self.scope['user'].instance.email
-            }
-        )
-
-    async def chat_message(self, event):
-        message = event['message']
-        user = event['user'].instance
-
-        # Send message to WebSocket
-        await self.send(text_data=json.dumps({
-            'message': message,
-            'user': user
-        }))
-
-    @sync_to_async
-    def save_message(self, message):
-        user = self.scope['user'].instance
-        room = DMRoom.objects.get(id=self.room_name)
-        DirectMessage.objects.create(user=user, room=room, content=message)
+    @action()
+    async def leave_room(self, room_id, **kwargs):
+        """
+        채팅방 나가기
+        """
+        room = await database_sync_to_async(models.DMRoom.objects.get)(pk=room_id)
+        room.current_users.remove(self.scope['user'])
+        return {"message": "채팅방에서 나갔습니다."}, 200
