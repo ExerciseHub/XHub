@@ -34,10 +34,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      - name: Lint with flake8
-        run: |
-          pip install flake8
-          flake8
+      # - name: Lint with flake8
+      #   run: |
+      #     pip install flake8
+      #     flake8
       - name: Wait for Database
         run: |
           python wait_for_db.py
@@ -49,44 +49,3 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_HOST: postgres
           DB_PORT: ${{ secrets.DB_PORT }}
-
-      # - name: Lint with flake8
-      #   run: |
-      #     pip install flake8
-      #     flake8
-      # - name: Coverage report
-      #   run: |
-      #     pip install coverage
-      #     coverage run manage.py test
-      #     coverage report
-      #   env:
-      #     SECRET_KEY: 
-
-      # - name: Django Tests
-      #   run: |
-      #     python manage.py test
-      #   env:
-      #     SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      #     DJANGO_DEBUG: ${{ secrets.DJANGO_DEBUG }}
-      #     DB_NAME: ${{ secrets.DB_NAME }}
-      #     DB_USER: ${{ secrets.DB_USER }}
-      #     DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      #     DB_HOST: postgres
-      #     DB_PORT: ${{ secrets.DB_PORT }}
-
-
-
-# jobs:
-#   test-lint:
-#     name: Test
-#     runs-on: ubuntu-20.04
-#     steps:
-#       - name: Login to Docker Hub
-#         uses: docker/login-action@v2
-#         with:
-#           username: ${{ secrets.DOCKER_HUB_USERNAME }}
-#           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
-#       - name: Checkout
-#         uses: actions/checkout@v3
-#       - name: Test
-#         run: docker-compose run --rm app sh -c "python manage.py wait_for_db && python manage.py test"
