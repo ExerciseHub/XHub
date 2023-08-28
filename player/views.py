@@ -1,3 +1,4 @@
+from django.http import Http404
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import generics, status, filters
 from rest_framework.views import APIView
@@ -9,7 +10,11 @@ from rest_framework.generics import (
     RetrieveUpdateAPIView,
     ListAPIView,
 )
-from .models import User, DMRoom, DirectMessage
+from .models import (
+    User,
+    DMRoom,
+    DirectMessage
+)
 from .serializers import (
     UserSerializer,
     LoginSerializer,
@@ -179,8 +184,21 @@ class CreateRoomView(CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        serializer = RoomSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(host=self.request.user)
-            return Response({"message": "채팅방 생성!"}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # 두 사용자의 ID를 받아옵니다. 
+        user1 = request.user.id
+        user2 = request.data.get("partner_id")
+
+        # 유효성 검사: 파트너 사용자가 실제로 존재하는지 확인합니다.
+        if not User.objects.filter(id=user2).exists():
+            raise Http404("지정된 파트너 사용자가 존재하지 않습니다.")
+
+        # 방 이름을 생성합니다. 항상 작은 숫자가 앞에 오도록 합니다.
+        room_name = f"{min(user1, user2)}/{max(user1, user2)}"
+
+        # 해당 이름의 방이 이미 존재하는지 확인하고, 있다면 기존 방을 반환합니다.
+        room, created = DMRoom.objects.get_or_create(name=room_name, defaults={"host": request.user})
+
+        if created:
+            return Response({"message": "채팅방 생성!", "room_id": room.id}, status=status.HTTP_201_CREATED)
+        else:
+            return Response({"message": "이미 존재하는 채팅방입니다.", "room_id": room.id}, status=status.HTTP_200_OK)
