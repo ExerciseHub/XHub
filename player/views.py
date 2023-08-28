@@ -8,16 +8,12 @@ from rest_framework.generics import (
     DestroyAPIView,
     RetrieveUpdateAPIView,
     ListAPIView,
-    ListCreateAPIView,
-    RetrieveAPIView,
 )
-from .models import User, DMRoom, DirectMessage
+from .models import User
 from .serializers import (
     UserSerializer,
     LoginSerializer,
     UserUpdateSerializer,
-    MessageSerializer,
-    RoomSerializer,
 )
 
 
@@ -162,27 +158,3 @@ class RemoveFriendView(DestroyAPIView):
         request.user.friend.remove(friend)
 
         return Response({"message": f"{friend.nickname if friend.nickname else friend.email}님이 친구 목록에서 제거되었습니다."}, status=status.HTTP_204_NO_CONTENT)
-
-
-### chat
-class MessageListView(ListAPIView):
-    queryset = DirectMessage.objects.all()
-    serializer_class = MessageSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        room_id = self.kwargs['room_id']
-        return DirectMessage.objects.filter(room_id=room_id)
-
-
-class CreateRoomView(CreateAPIView):
-    queryset = DMRoom.objects.all()
-    serializer_class = RoomSerializer
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, *args, **kwargs):
-        serializer = RoomSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(host=self.request.user)
-            return Response({"message": "채팅방 생성!"}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

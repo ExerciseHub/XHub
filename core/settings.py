@@ -38,7 +38,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DJANGO_DEBUG')
 
-ALLOWED_HOSTS = ['daphne', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = []
 
 
 AUTHENTICATION_BACKENDS = (
@@ -59,6 +59,7 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
 
 
 # Application definition

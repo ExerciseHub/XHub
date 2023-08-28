@@ -34,9 +34,6 @@ services:  # 서비스 목록을 정의합니다.
 
   redis:
     image: redis:latest
-    ports:
-    - "6379:6379"
-
 
   daphne:
     build:
@@ -57,7 +54,6 @@ services:  # 서비스 목록을 정의합니다.
     volumes:
       - .:/app
       - ./staticfiles:/staticfiles
-      - daphne-socket:/tmp
     hostname: daphne
     command: ["daphne", "-u", "/tmp/daphne.sock", "core.asgi:application"]
 
@@ -71,11 +67,9 @@ services:  # 서비스 목록을 정의합니다.
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       # 본 nginx 의 정적 파일 경로를 설정합니다.
       - ./staticfiles:/staticfiles
-      - daphne-socket:/tmp
     depends_on:
       - django # django 서비스가 시작된 후에 nginx 서비스를 시작합니다.
       - daphne
 
 volumes:  # 볼륨을 정의합니다.
   pgdata:  # pgdata 볼륨을 생성합니다.
-  daphne-socket:

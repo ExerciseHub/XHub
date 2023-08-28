@@ -1,7 +1,6 @@
 from django.contrib import admin
-from .models import User, DMRoom, DirectMessage
+from .models import User, DirectChatting
 
 
 admin.site.register(User)
-admin.site.register(DMRoom)
-admin.site.register(DirectMessage)
+admin.site.register(DirectChatting)
