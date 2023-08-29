@@ -1,6 +1,6 @@
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
-from django.db.models import Q
 
 from rest_framework import status
 from rest_framework.views import APIView
@@ -11,8 +11,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Meeting, MeetingMembers
 from .serializers import MeetingSerializer, MeetingChangeSerializer
 
-User = get_user_model()
 
+User = get_user_model()
 
 class CreateMeeting(APIView):
     permission_classes = [IsAuthenticated]

@@ -17,5 +17,7 @@ urlpatterns = [
     path('<int:quickmatchId>/status/', ChangeMeetingStatus.as_view(), name='status'),
 
     # 모임 검색
-    path('search/', MeetingSearchView.as_view(), name="search")
+    path('search/', MeetingSearchView.as_view(), name="search"),
+    
+    # path('quickmatch/<int:quickmatchId>/ws/room/', MeetingRoomConsumer.as_asgi(), name="search"),
 ]

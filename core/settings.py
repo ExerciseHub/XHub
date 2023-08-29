@@ -56,6 +56,7 @@ CHANNEL_LAYERS = {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
             "hosts": [('redis', 6379)],
+            # "hosts": [('127.0.0.1', 6379)],
         },
     },
 }
@@ -65,7 +66,9 @@ CHANNEL_LAYERS = {
 # Application definition
 
 INSTALLED_APPS = [
-    "daphne",
+    'daphne',
+    'channels',
+    'djangochannelsrestframework',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -77,7 +80,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'drf_yasg', # swagger
-    'channels',
     
     # 내부 기능(앱)
     'player',
