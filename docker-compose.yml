@@ -51,16 +51,16 @@ services:  # 서비스 목록을 정의합니다.
       DB_HOST: ${DB_HOST}
       DB_PORT: ${DB_PORT}
     depends_on:
-      - django
-      # - db
-      # - redis
+      # - django
+      - db
+      - redis
     volumes:
       - .:/app
       - ./staticfiles:/staticfiles
       - daphne-socket:/tmp
     hostname: daphne
-    command: ["daphne", "-b", "0.0.0.0", "-p", "8001", "core.asgi:application"]
-    # command: ["daphne", "-u", "/tmp/daphne.sock", "core.asgi:application"]
+    # command: ["daphne", "-b", "0.0.0.0", "-p", "8001", "core.asgi:application"]
+    command: ["daphne", "-u", "/tmp/daphne.sock", "core.asgi:application"]
 
 
   nginx:
@@ -74,7 +74,7 @@ services:  # 서비스 목록을 정의합니다.
       - ./staticfiles:/staticfiles
       - daphne-socket:/tmp
     depends_on:
-      # - django # django 서비스가 시작된 후에 nginx 서비스를 시작합니다.
+      - django # django 서비스가 시작된 후에 nginx 서비스를 시작합니다.
       - daphne
 
 volumes:  # 볼륨을 정의합니다.

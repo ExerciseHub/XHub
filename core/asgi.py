@@ -1,6 +1,5 @@
 import os
 
-from channels.routing import ProtocolTypeRouter
 from django.core.asgi import get_asgi_application
 
 from channels.auth import AuthMiddlewareStack
@@ -13,7 +12,17 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 # is populated before importing code that may import ORM models.
 django_asgi_app = get_asgi_application()
 
-## AllowedHostsOriginValidator 때문에 403 Access Denied
+
+from django.urls import path
+from quickmatch import consumers
+
+application = ProtocolTypeRouter({
+    "websocket": URLRouter([
+        path("ws/quickmatch/<int:quickmatchId>/room/", consumers.MeetingRoomConsumer.as_asgi()),
+    ]),
+})
+
+## AuthMiddlewareStack, AllowedHostsOriginValidator 때문에 403 Access Denied
 # import quickmatch.routing
 
 # application = ProtocolTypeRouter({
@@ -29,16 +38,3 @@ django_asgi_app = get_asgi_application()
 #         )
 #     ),
 # })
-
-## 테스트 버전
-from django.urls import path
-from quickmatch import consumers
-
-application = ProtocolTypeRouter({
-    "http": django_asgi_app,
-    # Just HTTP for now. (We can add other protocols later.)
-})
-
-
-
-
