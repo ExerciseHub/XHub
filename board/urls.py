@@ -22,7 +22,7 @@ urlpatterns = [
     # 게시글 좋아요
     path('<int:id>/like/', LikePostView.as_view(), name='like'),
 
-### Comment
+    ### Comment
     # 댓글 작성
     path('<int:board_id>/comment/', CommentWriteView.as_view(), name='cm-write'),
 

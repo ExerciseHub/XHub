@@ -1,5 +1,4 @@
 from django.urls import path
-from .views import RegisterView, UnregisterUserView
 from .views import (
     RegisterView,
     Login,
@@ -12,7 +11,7 @@ from .views import (
     RemoveFriendView,
     MessageListView,
     CreateRoomView,
-    )
+)
 
 app_name = "player"
 

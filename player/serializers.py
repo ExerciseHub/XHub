@@ -1,9 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 
-from .models import User
-from django.contrib.auth import authenticate
-from .models import User,  DMRoom, DirectMessage
+from .models import User, DMRoom, DirectMessage
 
 
 class UserSerializer(serializers.ModelSerializer):
