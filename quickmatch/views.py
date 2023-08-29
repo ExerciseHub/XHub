@@ -1,6 +1,6 @@
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
-from django.db.models import Q
 
 from rest_framework import status
 from rest_framework.views import APIView
@@ -8,12 +8,9 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from .models import Meeting, MeetingMembers, MeetingMessage
+from .models import Meeting, MeetingMembers
 from .serializers import MeetingSerializer, MeetingChangeSerializer
 
-import io
-from rest_framework.parsers import JSONParser
-from django.contrib.auth import get_user_model
 
 User = get_user_model()
 

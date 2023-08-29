@@ -1,4 +1,5 @@
 from django.http import Http404
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import generics, status, filters
 from rest_framework.views import APIView
@@ -22,6 +23,10 @@ from .serializers import (
     MessageSerializer,
     RoomSerializer,
 )
+import json
+import redis
+
+r = redis.StrictRedis(host='redis', port=6379, db=0)
 
 
 class RegisterView(generics.CreateAPIView):
@@ -175,7 +180,44 @@ class MessageListView(ListAPIView):
 
     def get_queryset(self):
         room_id = self.kwargs['room_id']
-        return DirectMessage.objects.filter(room_id=room_id)
+
+        # 방 이름 가져오기
+        try:
+            room = DMRoom.objects.get(id=room_id)
+            room_name = room.name
+        except ObjectDoesNotExist:
+            return []
+
+        # Redis에서 해당 방의 최근 메시지를 가져옵니다.
+        r = redis.StrictRedis(host='redis', port=6379, db=0)
+        recent_messages_data = r.lrange(room_name, 0, 9)  # 최근 10개의 메시지 가져오기
+
+        if recent_messages_data:
+            # Redis에서 가져온 'bytes' 데이터를 역직렬화하여 Python 객체로 변환
+            recent_messages = [json.loads(message.decode("utf-8")) for message in recent_messages_data]
+
+            # Python 객체를 DirectMessage 객체 리스트로 변환
+            messages_objects = []
+            for message_data in recent_messages:
+                message = DirectMessage(content=message_data['content'], created_at=message_data['created_at'])
+                messages_objects.append(message)
+
+            return messages_objects
+
+        else:
+            # Redis에 데이터가 없는 경우 데이터베이스에서 가져옵니다.
+            messages = DirectMessage.objects.filter(room_id=room_id).order_by('-created_at')[:10]
+
+            # 가져온 메시지를 Redis에 다시 저장합니다.
+            for message in messages:
+                # 직렬화하여 저장
+                message_data = {
+                    'content': message.content,
+                    'created_at': message.created_at.strftime('%Y-%m-%d %H:%M:%S')
+                }
+                r.lpush(room_name, json.dumps(message_data))
+
+            return messages
 
 
 class CreateRoomView(CreateAPIView):

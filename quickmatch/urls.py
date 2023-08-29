@@ -1,8 +1,6 @@
 from django.urls import path
 from .views import CreateMeeting, DeleteMeeting, JoinMeeting, ChangeMeetingStatus, MeetingSearchView
 
-from .consumers import MeetingRoomConsumer
-
 app_name = 'quickmatch'
 
 urlpatterns = [

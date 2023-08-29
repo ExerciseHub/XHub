@@ -1,10 +1,15 @@
 import json
+import redis
+from datetime import datetime
+
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
-from .models import DirectMessage, DMRoom
 from django.contrib.auth import get_user_model
 
+from .models import DirectMessage, DMRoom
+
 User = get_user_model()
+r = redis.StrictRedis(host='redis', port=6379, db=0)
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -32,6 +37,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         await self.store_message(message)
 
+        # Redis에 메시지 저장
+        self.save_message_to_redis(message)
         await self.channel_layer.group_send(
             self.name,
             {
@@ -42,9 +49,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def chat_message(self, event):
         message = event['message']
-
         await self.send(text_data=json.dumps({
-            'message': message
+            'message': f"{message} check"
         }))
 
     @database_sync_to_async
@@ -53,3 +59,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         user = User.objects.get(id=user_id)
         room = DMRoom.objects.get(name=self.name, host=user)
         DirectMessage.objects.create(room=room, user=user, content=message)
+
+    def save_message_to_redis(self, message):
+        # 메시지를 직렬화하여 저장
+        print(f"message: {message}")
+        message_data = {
+            'content': message,
+            'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+        print(f"message_data: {message_data}")
+        r.lpush(self.name, json.dumps(message_data).encode('utf-8'))  # 직렬화 및 인코딩
+        # 최근 10개의 메시지만 저장하도록 리스트 크기를 제한
+        r.ltrim(self.name, 0, 9)
