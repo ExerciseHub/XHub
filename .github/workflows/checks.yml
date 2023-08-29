@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-
+    # runs-on: ubuntu-20.04 (만약 기존 프로젝트와 우분투 충돌시, 2023 최신 22.04)
     runs-on: ubuntu-latest
     services:
       postgres:
