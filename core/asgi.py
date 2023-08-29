@@ -13,11 +13,13 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 django_asgi_app = get_asgi_application()
 
 
-from django.urls import path
+from django.urls import path, re_path
 from quickmatch import consumers
+from player.consumers import ChatConsumer
 
 application = ProtocolTypeRouter({
     "websocket": URLRouter([
+        re_path(r'ws/chat/(?P<user_id_1>\d+)/(?P<user_id_2>\d+)/$', ChatConsumer.as_asgi()),
         path("ws/quickmatch/<int:quickmatchId>/room/", consumers.MeetingRoomConsumer.as_asgi()),
     ]),
 })
