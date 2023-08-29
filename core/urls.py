@@ -1,9 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
 
-# channels jwt
-from django_channels_jwt.views import AsgiValidateTokenView
-
 # swagger
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
@@ -32,9 +29,6 @@ urlpatterns = [
     
     # swagger
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-
-    # channels jwt
-    path("auth_for_ws_connection/", AsgiValidateTokenView.as_view()),
     
     path('player/', include('player.urls')),
     path('quickmatch/', include('quickmatch.urls')),

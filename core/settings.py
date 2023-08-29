@@ -78,7 +78,6 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'drf_yasg', # swagger
     'channels',
-    'djangochannelsrestframework',
     
     # 내부 기능(앱)
     'player',
