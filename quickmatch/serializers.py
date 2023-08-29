@@ -45,4 +45,14 @@ class MeetingMessageSerializer(serializers.ModelSerializer):
         
 
 class MeetingRoomSerializer(serializers.ModelSerializer):
-    pass
+    last_message = serializers.SerializerMethodField()
+    messages = MeetingMessageSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = MeetingRoom
+        fields = ["pk", "name", "meeting", "host", "messages", "current_users", "last_message"]
+        depth = 1
+        read_only_fields = ["messages", "last_message"]
+
+    def get_last_message(self, obj:MeetingRoom):
+        return MeetingMessageSerializer(obj.messages.order_by('created_at').last()).data

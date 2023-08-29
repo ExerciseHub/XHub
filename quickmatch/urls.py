@@ -1,6 +1,8 @@
 from django.urls import path
 from .views import CreateMeeting, DeleteMeeting, JoinMeeting, ChangeMeetingStatus, MeetingSearchView
 
+from .consumers import MeetingRoomConsumer
+
 app_name = 'quickmatch'
 
 urlpatterns = [
@@ -17,5 +19,7 @@ urlpatterns = [
     path('<int:quickmatchId>/status/', ChangeMeetingStatus.as_view(), name='status'),
 
     # 모임 검색
-    path('search/', MeetingSearchView.as_view(), name="search")
+    path('search/', MeetingSearchView.as_view(), name="search"),
+    
+    # path('quickmatch/<int:quickmatchId>/ws/room/', MeetingRoomConsumer.as_asgi(), name="search"),
 ]

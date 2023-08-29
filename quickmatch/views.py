@@ -13,8 +13,8 @@ from .serializers import MeetingSerializer, MeetingChangeSerializer
 import io
 from rest_framework.parsers import JSONParser
 from django.contrib.auth import get_user_model
-User = get_user_model()
 
+User = get_user_model()
 
 class CreateMeeting(APIView):
     permission_classes = [IsAuthenticated]

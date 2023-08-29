@@ -63,4 +63,4 @@ class MeetingMessage(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f"{self.rooom}-message({self.user}) : {self.text}"
+        return f"{self.room}-message({self.user}) : {self.content}"
