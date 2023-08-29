@@ -39,10 +39,13 @@ jobs:
         run: |
           pip install flake8
           flake8
-      - name: Format with black
-        run: |
-          pip install black
-          black --check .
+
+      - uses: psf/black@stable
+        with:
+          options: "--check --verbose"
+          src: "./src"
+          version: "~= 22.0"
+
       - name: Wait for Database
         run: |
           python wait_for_db.py
