@@ -184,7 +184,7 @@ class CreateRoomView(CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        # 두 사용자의 ID를 받아옵니다. 
+        # 두 사용자의 ID를 받아옵니다.
         user1 = request.user.id
         user2 = request.data.get("partner_id")
 

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Meeting, MeetingChat
+from .models import Meeting
 
 class MeetingSerializer(serializers.ModelSerializer):
     

@@ -1,7 +1,7 @@
 # XHub
 단체 스포츠 모임 플랫폼 (Team sports gathering platform)
 
-## Code Convention(삭제 예정)
+## Code Convention
 ### Code lay-out
 - 들여쓰기(indent)
     - class 별 2칸
@@ -15,7 +15,7 @@
 - 함수명과 변수명은 스네이크케이스(snake_case)로 작성합니다.
 
 
-## 브랜치 전략(삭제 예정)
+## 브랜치 전략
 - 배포 브랜치: main
 - 개발 브랜치: develop
     - 배포 전 기능 테스트 브랜치
@@ -53,9 +53,11 @@
 기능 별 테이블 구분
 - player
     - User
-    - DirectChatting
+    - DMRoom
+    - DirectMessage
 - quickmatch
     - Meeting
+    - MeetingMember
     - MeetingChat
 - board
     - Post
