@@ -1,9 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 
-from .models import User
-from django.contrib.auth import authenticate
-from .models import User
+from .models import User, DMRoom, DirectMessage
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -77,3 +75,29 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             instance.save()
 
             return instance
+
+class MessageSerializer(serializers.ModelSerializer):
+    created_at_formatted = serializers.SerializerMethodField()
+    user = UserSerializer()
+
+    class Meta:
+        model = DirectMessage
+        exclude = []
+        depth = 1
+
+    def get_created_at_formatted(self, obj):
+        return obj.created_at.strftime("%Y-%m-%d %H:%M%S")
+
+
+class RoomSerializer(serializers.ModelSerializer):
+    last_message = serializers.SerializerMethodField()
+    messages = MessageSerializer(read_only=True)
+
+    class Meta:
+        model = DMRoom
+        fields = ["pk", "name", "host", "messages", "current_users", "last_message"]
+        depth = 1
+        read_only_fields = ["messages", "last_message"]
+
+    def get_last_message(self, obj):
+        return MessageSerializer(obj.messages.order_by('created_at').last()).data

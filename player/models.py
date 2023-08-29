@@ -59,7 +59,20 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []  # 이제 기본적으로 이메일이 필요하므로 이 목록에서 제거
 
 
-class DirectChatting(models.Model):
-    role = models.ForeignKey("User", on_delete=models.CASCADE)
-    content = models.TextField()
+class DMRoom(models.Model):
+    name = models.CharField(max_length=255, null=True, blank=True, unique=True)
+    host = models.ForeignKey("User", on_delete=models.CASCADE, related_name="room")
+    current_users = models.ManyToManyField(User, related_name="current_room", blank=True)
+
+    def __str__(self):
+        return f"Room({self.name} {self.host})"
+
+
+class DirectMessage(models.Model):
+    room = models.ForeignKey("DMRoom", on_delete=models.CASCADE, related_name="messages")
+    user = models.ForeignKey("User", on_delete=models.CASCADE, related_name="messages")
+    content = models.TextField(max_length=500)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Message({self.user} {self.room})"
