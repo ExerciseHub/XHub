@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Meeting
+from .models import Meeting, MeetingMessage, MeetingRoom
 
 class MeetingSerializer(serializers.ModelSerializer):
     
@@ -32,3 +32,15 @@ class MeetingChangeSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+
+class MeetingMessageSerializer(serializers.ModelSerializer):
+    class Meta():
+        model = MeetingMessage
+        fields = '__all__'
+
+
+class MeetingRoomSerializer(serializers.ModelSerializer):
+    class Meta():
+        model = MeetingRoom
+        fields = '__all__'

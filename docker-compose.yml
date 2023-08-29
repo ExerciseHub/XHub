@@ -51,6 +51,7 @@ services:  # 서비스 목록을 정의합니다.
       DB_HOST: ${DB_HOST}
       DB_PORT: ${DB_PORT}
     depends_on:
+      # - django
       - db
       - redis
     volumes:
@@ -58,6 +59,7 @@ services:  # 서비스 목록을 정의합니다.
       - ./staticfiles:/staticfiles
       - daphne-socket:/tmp
     hostname: daphne
+    # command: ["daphne", "-b", "0.0.0.0", "-p", "8001", "core.asgi:application"]
     command: ["daphne", "-u", "/tmp/daphne.sock", "core.asgi:application"]
 
 

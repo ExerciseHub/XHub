@@ -8,11 +8,14 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from .models import Meeting, MeetingMembers
+from .models import Meeting, MeetingMembers, MeetingMessage
 from .serializers import MeetingSerializer, MeetingChangeSerializer
 
-User = get_user_model()
+import io
+from rest_framework.parsers import JSONParser
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
 
 class CreateMeeting(APIView):
     permission_classes = [IsAuthenticated]
