@@ -24,73 +24,132 @@
 #    See the documentation for each action used below for the recommended IAM policies for this IAM user,
 #    and best practices on handling the access key credentials.
 
-name: Deploy to Amazon ECS
+# name: Deploy to Amazon ECS
 
+# on:
+#   push:
+#     branches: [ "main" ]
+
+# env:
+#   AWS_REGION: ap-northeast-2 # MY_AWS_REGION                   # set this to your preferred AWS region, e.g. us-west-1
+#   ECR_REPOSITORY: xhub-django # MY_ECR_REPOSITORY           # set this to your Amazon ECR repository name
+#   ECS_SERVICE: xhub-service # MY_ECS_SERVICE                 # set this to your Amazon ECS service name
+#   ECS_CLUSTER: xhub-cluster # MY_ECS_CLUSTER                 # set this to your Amazon ECS cluster name
+#   ECS_TASK_DEFINITION: ./.github/workflows/aws/xhub-api-revision1.json
+#  # xhub-api # MY_ECS_TASK_DEFINITION # set this to the path to your Amazon ECS task definition
+#                                                # file, e.g. .aws/task-definition.json
+#   CONTAINER_NAME: test # ECS task definition 에서 json 에 containerDefinitions 배열의 name. MY_CONTAINER_NAME           # set this to the name of the container in the
+#                                                # containerDefinitions section of your task definition
+
+# permissions:
+#   contents: read
+
+# jobs:
+#   deploy:
+#     name: Deploy
+#     runs-on: ubuntu-latest
+#     environment: production
+
+#     steps:
+#     - name: Checkout
+#       uses: actions/checkout@v3
+
+#     - name: Configure AWS credentials
+#       uses: aws-actions/configure-aws-credentials@v1
+#       with:
+#         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#         aws-region: ${{ env.AWS_REGION }}
+
+#     - name: Login to Amazon ECR
+#       id: login-ecr
+#       uses: aws-actions/amazon-ecr-login@v1
+
+#     - name: Build, tag, and push image to Amazon ECR
+#       id: build-image
+#       env:
+#         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+#         IMAGE_TAG: ${{ github.sha }}
+#       run: |
+#         # Build a docker container and
+#         # push it to ECR so that it can
+#         # be deployed to ECS.
+#         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+#         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+#         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+#     - name: Fill in the new image ID in the Amazon ECS task definition
+#       id: task-def
+#       uses: aws-actions/amazon-ecs-render-task-definition@v1
+#       with:
+#         task-definition: ${{ env.ECS_TASK_DEFINITION }}
+#         container-name: ${{ env.CONTAINER_NAME }}
+#         # image: ${{ steps.build-image.outputs.image }}
+#         image: 888249344754.dkr.ecr.ap-northeast-2.amazonaws.com/xhub-ecr-docker:latest
+
+#     - name: Deploy Amazon ECS task definition
+#       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+#       with:
+#         task-definition: ${{ steps.task-def.outputs.task-definition }}
+#         service: ${{ env.ECS_SERVICE }}
+#         cluster: ${{ env.ECS_CLUSTER }}
+#         wait-for-service-stability: true
+
+# 경계선
+
+name: Deploy Django to ECS
 on:
   push:
-    branches: [ "main" ]
-
+    branches:
+      - main
+      
 env:
-  AWS_REGION: ap-northeast-2 # MY_AWS_REGION                   # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY: xhub-django # MY_ECR_REPOSITORY           # set this to your Amazon ECR repository name
-  ECS_SERVICE: xhub-service # MY_ECS_SERVICE                 # set this to your Amazon ECS service name
-  ECS_CLUSTER: xhub-cluster # MY_ECS_CLUSTER                 # set this to your Amazon ECS cluster name
-  ECS_TASK_DEFINITION: ./.github/workflows/aws/xhub-api-revision1.json
- # xhub-api # MY_ECS_TASK_DEFINITION # set this to the path to your Amazon ECS task definition
-                                               # file, e.g. .aws/task-definition.json
-  CONTAINER_NAME: test # ECS task definition 에서 json 에 containerDefinitions 배열의 name. MY_CONTAINER_NAME           # set this to the name of the container in the
-                                               # containerDefinitions section of your task definition
-
-permissions:
-  contents: read
+  AWS_REGION: ap-northeast-2
+  ECS_CLUSTER_NAME: xhub-cluster
+  ECR_REPOSITORY_NAME: xhub-django
+  ECS_CONTAINER_NAME: test
+  ECS_SERVICE_NAME: xhub-service
+  TASK_DEFINITION_NAME: xhub-api
 
 jobs:
   deploy:
-    name: Deploy
     runs-on: ubuntu-latest
-    environment: production
-
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v2
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Build, tag, and push image to Amazon ECR
-      id: build-image
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        IMAGE_TAG: ${{ github.sha }}
-      run: |
-        # Build a docker container and
-        # push it to ECR so that it can
-        # be deployed to ECS.
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NAME }}:latest .
+          docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NAME }}:latest
 
-    - name: Fill in the new image ID in the Amazon ECS task definition
-      id: task-def
-      uses: aws-actions/amazon-ecs-render-task-definition@v1
-      with:
-        task-definition: ${{ env.ECS_TASK_DEFINITION }}
-        container-name: ${{ env.CONTAINER_NAME }}
-        # image: ${{ steps.build-image.outputs.image }}
-        image: 888249344754.dkr.ecr.ap-northeast-2.amazonaws.com/xhub-ecr-docker:latest
+      - name: Download Task Definition
+        run: |
+          aws ecs describe-task-definition --task-definition ${{ env.TASK_DEFINITION_NAME }} --query taskDefinition > task-definition.json
 
-    - name: Deploy Amazon ECS task definition
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-      with:
-        task-definition: ${{ steps.task-def.outputs.task-definition }}
-        service: ${{ env.ECS_SERVICE }}
-        cluster: ${{ env.ECS_CLUSTER }}
-        wait-for-service-stability: true
+      - name: Update Task Definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: ${{ env.ECS_CONTAINER_NAME }}
+          image: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NAME }}:latest
+
+      - name: Deploy to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE_NAME }}
+          cluster: ${{ env.ECS_CLUSTER_NAME }}
+          wait-for-service-stability: true
