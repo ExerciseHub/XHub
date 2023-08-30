@@ -62,13 +62,19 @@ CHANNEL_LAYERS = {
 }
 
 
+# Celery configurations
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Seoul'
+
 
 # Application definition
-
 INSTALLED_APPS = [
     'daphne',
     'channels',
-    'djangochannelsrestframework',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -80,15 +86,12 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'drf_yasg', # swagger
-    # 'channels',
-    # 'djangochannelsrestframework',
+    "celery",
     
     # 내부 기능(앱)
     'player',
     'quickmatch',
     'board',
-    
-    # 'redis',
 ]
 
 # REST_Framework

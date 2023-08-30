@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 
@@ -86,7 +88,15 @@ class MessageSerializer(serializers.ModelSerializer):
         depth = 1
 
     def get_created_at_formatted(self, obj):
-        return obj.created_at.strftime("%Y-%m-%d %H:%M%S")
+        # 만약 obj.created_at이 문자열이면 그대로 반환합니다.
+        if isinstance(obj.created_at, str):
+            return obj.created_at
+        # 만약 obj.created_at이 datetime 객체면, 포맷에 맞게 변환해서 반환합니다.
+        elif isinstance(obj.created_at, datetime):
+            return obj.created_at.strftime("%Y-%m-%d %H:%M%S")
+        # 그 외의 경우에는 None을 반환합니다.
+        else:
+            return None
 
 
 class RoomSerializer(serializers.ModelSerializer):
