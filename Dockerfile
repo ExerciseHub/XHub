@@ -19,7 +19,7 @@ COPY . /app
 
 # requirements.txt에 지정된 패키지를 설치합니다.
 RUN pip install -r requirements.txt
-
+RUN chmod -R 755 /app/staticfiles
 # 컨테이너 외부에서 8000 포트에 액세스할 수 있도록 합니다.
 EXPOSE 8000
 

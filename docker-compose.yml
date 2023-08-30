@@ -20,7 +20,7 @@ services:  # 서비스 목록을 정의합니다.
       # 현재 디렉토리를 컨테이너의 /app 디렉토리에 마운트합니다.
       - .:/app  
       # 본 장고의 정적 파일 경로를 설정합니다.
-      - ./staticfiles:/staticfiles 
+      - ./staticfiles:/app/staticfiles
     hostname: django
 
   db:
