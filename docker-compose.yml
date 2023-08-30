@@ -1,0 +1,75 @@
+version: '3'  # Docker Compose의 버전을 지정합니다.
+
+services:  # 서비스 목록을 정의합니다.
+  django:  # Django 애플리케이션 서비스를 정의합니다.
+    build:  # 이미지 빌드 정보를 지정합니다.
+      context: .  # 빌드 컨텍스트로 현재 디렉토리를 사용합니다.
+      dockerfile: Dockerfile  # 사용할 Dockerfile을 지정합니다.
+    ports:
+      - "8000:8000"  # 호스트의 8000 포트와 컨테이너의 8000 포트를 연결합니다.
+    environment:  # 환경 변수를 설정합니다.
+      DJANGO_SETTINGS_MODULE: core.settings
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+    depends_on:
+      - db  # db 서비스가 시작된 후에 django 서비스를 시작합니다.
+    volumes:
+      # 현재 디렉토리를 컨테이너의 /app 디렉토리에 마운트합니다.
+      - .:/app  
+      # 본 장고의 정적 파일 경로를 설정합니다.
+      - ./staticfiles:/app/staticfiles
+    hostname: django
+
+  db:
+    image: postgres:15.4-alpine3.18
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:latest
+
+  daphne:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      DJANGO_SETTINGS_MODULE: core.settings
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - .:/app
+      - ./staticfiles:/staticfiles
+    hostname: daphne
+    command: ["daphne", "-u", "/tmp/daphne.sock", "core.asgi:application"]
+
+
+  nginx:
+    image: nginx:1.25.2 # 최신 버전의 nginx 이미지를 사용합니다.
+    ports:
+      - "80:80" # 호스트의 80 포트와 컨테이너의 80 포트를 맵핑합니다.
+    volumes:
+      # 호스트의 ./nginx/nginx.conf 파일을 컨테이너의 /etc/nginx/nginx.conf 위치에 읽기 전용으로 마운트합니다.
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      # 본 nginx 의 정적 파일 경로를 설정합니다.
+      - ./staticfiles:/staticfiles
+    depends_on:
+      - django # django 서비스가 시작된 후에 nginx 서비스를 시작합니다.
+      - daphne
+
+volumes:  # 볼륨을 정의합니다.
+  pgdata:  # pgdata 볼륨을 생성합니다.
