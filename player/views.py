@@ -30,6 +30,7 @@ r = redis.StrictRedis(host='redis', port=6379, db=0)
 
 
 class RegisterView(generics.CreateAPIView):
+    permission_classes = (AllowAny, )
     queryset = User.objects.all()
     serializer_class = UserSerializer
 

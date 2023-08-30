@@ -1,32 +1,133 @@
 import json
 
-from channels.generic.websocket import WebsocketConsumer
-
+from asgiref.sync import async_to_sync
+from channels.generic.websocket import WebsocketConsumer, AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
+
 # from djangochannelsrestframework.generics import GenericAsyncAPIConsumer
 # from djangochannelsrestframework.observer import model_observer
 # from djangochannelsrestframework.observer.generics import ObserverModelInstanceMixin, action
 
-
-class MeetingRoomConsumer(WebsocketConsumer):
-    
-    def connect(self):
-        self.accept()
-
-    def disconnect(self, close_code):
-        pass
-
-    def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        message = text_data_json["message"]
-
-        self.send(text_data=json.dumps({"message": message}))
-        
-        
-from .models import MeetingMessage, MeetingRoom, User
+from .models import MeetingMembers, MeetingMessage, MeetingRoom, User
 from .serializers import MeetingMessageSerializer, MeetingRoomSerializer
 from player.serializers import UserSerializer
 
+
+class MeetingRoomConsumerTest(WebsocketConsumer):
+    
+    def connect(self):
+        
+        self.room_name = self.scope['url_route']['kwargs']['quickmatchId']
+        self.room_group_name = 'chat_%s' % self.room_name
+        
+        # 그룹에 join
+        # send 등 과 같은 동기적인 함수를 비동기적으로 사용하기 위해서는 async_to_sync 로 감싸줘야한다.
+        async_to_sync(self.channel_layer.group_add)(
+            self.room_group_name,
+            self.channel_name
+        )
+        
+        self.accept()
+
+    def disconnect(self, close_code):
+        async_to_sync(self.channel_layer.group_discard)(
+            self.room_group_name,
+            self.channel_name
+        )
+
+    def receive(self, text_data):
+        # self.test = self.scope['url_route']['kwargs']['quickmatchId']
+        # self.send(text_data=json.dumps({"message2": self.test}))
+        
+        text_data_json = json.loads(text_data)
+        message = text_data_json["message"]
+
+        # room group 에게 메세지 send
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_group_name,
+            {
+                'type': 'chat_message',
+                'message': message
+            }
+        )
+        
+        # self.send(text_data=json.dumps({"message": message}))
+        
+    def chat_message(self, event):
+        message = event['message']
+        
+        # WebSocket 에게 메세지 전송
+        self.send(text_data=json.dumps({
+            'message': message
+        }))
+        
+
+class MeetingRoomConsumer(AsyncWebsocketConsumer):
+    
+    async def connect(self):
+        self.room_name = self.scope['url_route']['kwargs']['quickmatchId']
+        self.room_group_name = 'quickmatch_%s_chat' % self.room_name
+
+        # Join room group
+        await self.channel_layer.group_add(
+            self.room_group_name,
+            self.channel_name
+        )
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        # Leave room group
+        await self.channel_layer.group_discard(
+            self.room_group_name,
+            self.channel_name
+        )
+
+    # Receive message from WebSocket
+    async def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        message = text_data_json['message']
+
+        #회원 멤버인지 확인
+        self.members_email = await self.get_members_email()
+        
+        # Send message to room group
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'room_chat_message',
+                'message': message,
+                'mail': self.members_email,
+            }
+        )
+
+    # Receive message from room group
+    async def room_chat_message(self, event):
+        message = event['message']
+        email = event['mail']
+
+        # Send message to WebSocket
+        await self.send(text_data=json.dumps({
+            'message': message,
+            'email': email,
+        }))
+        
+    @database_sync_to_async
+    def get_members_email(self):
+        members = MeetingMembers.objects.filter(quickmatch=self.room_name)
+        members_email = [ i.attendant.email for i in members]
+        return members_email
+    
+    @database_sync_to_async
+    def save_message(self, message):
+        user_email = message['email']
+        user = User.objects.get(email=user_email)
+        meetingid = self.scope["url_route"]["kwargs"]["quickmatchId"]
+        meetingroom = MeetingRoom.objects.get(meeting=meetingid)
+        MeetingMessage.objects.create(room=meetingroom, user=user, content=message)
+    
+    
+    
+    
 # class MeetingRoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
 #     queryset = MeetingRoom.objects.all()
 #     serializer_class = MeetingRoomSerializer
