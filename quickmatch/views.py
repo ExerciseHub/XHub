@@ -2,14 +2,23 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from .models import Meeting, MeetingMembers
-from .serializers import MeetingSerializer, MeetingChangeSerializer
+from .models import (
+    Meeting,
+    MeetingMembers,
+    UserEvaluation,
+)
+from .serializers import (
+    MeetingSerializer,
+    MeetingChangeSerializer,
+    MeetingDetailSerializer,
+    UserEvaluationSerializer,
+)
 
 
 User = get_user_model()
@@ -151,3 +160,31 @@ class MeetingSearchView(ListAPIView):
             q_objects |= Q(title__icontains=term) | Q(location__icontains=term)
         
         return queryset.filter(q_objects)
+
+
+class MeetingDetailView(RetrieveAPIView):
+    queryset = Meeting.objects.all()
+    serializer_class = MeetingDetailSerializer
+    permission_classes = [AllowAny,]
+    lookup_field = 'pk'
+    lookup_url_kwarg = 'quickmatchId'
+
+
+class EvaluateUserView(generics.CreateAPIView):
+    queryset = UserEvaluation.objects.all()
+    serializer_class = UserEvaluationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        meeting = get_object_or_404(Meeting, pk=self.kwargs['meeting_id'])
+        evaluated_user = get_object_or_404(User, pk=self.kwargs['user_id'])
+        
+        # 평가자와 평가 대상이 동일한 모임에 참가했는지 확인
+        if self.request.user in meeting.meeting_member.all() and evaluated_user in meeting.meeting_member.all():
+            serializer.save(
+                evaluator=self.request.user,
+                evaluated=evaluated_user,
+                meeting=meeting
+            )
+        else:
+            raise serializer.ValidationError("잘못된 요청입니다.")
