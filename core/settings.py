@@ -87,6 +87,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'drf_yasg', # swagger
     "celery",
+    'corsheaders',
     
     # 내부 기능(앱)
     'player',
@@ -116,7 +117,17 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'corsheaders.middleware.CorsMiddleware',
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+# CORS_ALLOWED_ORIGINS = [
+#     "https://exercisehub.github.io/XHub-Client",
+#     "https://aminsc.github.io/XHub-Client",
+# ]
+
 
 ROOT_URLCONF = 'core.urls'
 

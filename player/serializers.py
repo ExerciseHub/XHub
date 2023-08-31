@@ -2,6 +2,7 @@ from datetime import datetime
 
 from rest_framework import serializers
 from django.contrib.auth import authenticate
+from django.contrib.auth.hashers import check_password
 
 from .models import User, DMRoom, DirectMessage
 
@@ -44,7 +45,7 @@ class LoginSerializer(serializers.Serializer):
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True, required=False)
 
     class Meta:
         model = User
@@ -77,6 +78,13 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             instance.save()
 
             return instance
+        
+        def validate_current_password(self, value):
+            user = self.context['request'].user
+            if not check_password(value, user.password):
+                raise serializers.ValidationError('현재 비밀번호가 맞지 않습니다.')
+            return value
+
 
 class MessageSerializer(serializers.ModelSerializer):
     created_at_formatted = serializers.SerializerMethodField()
@@ -111,3 +119,14 @@ class RoomSerializer(serializers.ModelSerializer):
 
     def get_last_message(self, obj):
         return MessageSerializer(obj.messages.order_by('created_at').last()).data
+
+
+class PasswordChangeSerializer(serializers.Serializer):
+    current_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
+    def validate_current_password(self, value):
+        if not check_password(value, self.context['request'].user.password):
+            raise serializers.ValidationError('현재 비밀번호가 맞지 않습니다.')
+        return value
+

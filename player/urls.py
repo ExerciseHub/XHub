@@ -11,6 +11,7 @@ from .views import (
     RemoveFriendView,
     MessageListView,
     CreateRoomView,
+    PasswordChangeView,
 )
 
 app_name = "player"
@@ -30,7 +31,10 @@ urlpatterns = [
 
     # 회원 정보수정
     # path('update/', Update, name='update'),
-    path('<int:id>/update/', Update.as_view(), name='update'),
+    path('update/', Update.as_view(), name='update'),
+
+    # 비밀번호 수정
+    path('update/ps/', PasswordChangeView.as_view(), name='pw_change'),
 
     # 회원 탈퇴
     # path("<str:playerId>/", 기능, name="remove"),
