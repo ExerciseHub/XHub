@@ -1,7 +1,7 @@
 from django.http import Http404
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework import generics, status, filters
+from rest_framework import status, filters
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
@@ -10,6 +10,7 @@ from rest_framework.generics import (
     DestroyAPIView,
     RetrieveUpdateAPIView,
     ListAPIView,
+    UpdateAPIView,
 )
 from .models import (
     User,
@@ -22,6 +23,7 @@ from .serializers import (
     UserUpdateSerializer,
     MessageSerializer,
     RoomSerializer,
+    PasswordChangeSerializer,
 )
 import json
 import redis
@@ -29,9 +31,10 @@ import redis
 r = redis.StrictRedis(host='redis', port=6379, db=0)
 
 
-class RegisterView(generics.CreateAPIView):
+class RegisterView(CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
         serializer = UserSerializer(data=request.data)
@@ -72,25 +75,23 @@ class Logout(DestroyAPIView):
 
 class Update(RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)
-    # renderer_classes 보류
-    queryset = User.objects.all()
     serializer_class = UserUpdateSerializer
-    lookup_field = 'id'
 
-    def get(self, reuqest, *args, **kwargs):
-        serializer = self.serializer_class(reuqest.user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    
-    def patch(self, request, *args, **kwargs):
-        serializer_data = request.data
+    def get_object(self):
+        return self.request.user
 
-        serializer = self.serializer_class(request.user, data=serializer_data, partial=True)
 
+class PasswordChangeView(UpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = PasswordChangeSerializer
+    permission_classes = [IsAuthenticated]
+
+    def update(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
-        serializer.save()
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        request.user.set_password(serializer.validated_data['new_password'])
+        request.user.save()
+        return Response({"detail": "비밀번호가 성공적으로 변경되었습니다."}, status=status.HTTP_200_OK)
 
 
 class UnregisterUserView(APIView):
