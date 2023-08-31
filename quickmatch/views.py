@@ -1,20 +1,27 @@
-from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
 
-from rest_framework import status, filters
+from rest_framework import status, generics
 from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from .models import Meeting, MeetingMembers, MeetingChat
-from .serializers import MeetingSerializer, MeetingChangeSerializer
+from .models import (
+    Meeting,
+    MeetingMembers,
+    UserEvaluation,
+)
+from .serializers import (
+    MeetingSerializer,
+    MeetingChangeSerializer,
+    MeetingDetailSerializer,
+    UserEvaluationSerializer,
+)
 
-import io
-from rest_framework.parsers import JSONParser
-from django.contrib.auth import get_user_model
+
 User = get_user_model()
-
 
 class CreateMeeting(APIView):
     permission_classes = [IsAuthenticated]
@@ -29,7 +36,7 @@ class CreateMeeting(APIView):
         if serializer.is_valid():
             
             data = serializer.data
-            quickmatch = serializer.create(data) # 오브젝트 생성만
+            quickmatch = serializer.create(data)  # 오브젝트 생성만
             quickmatch.organizer = request.user
             
             category_list = [i[0] for i in Meeting.CATEGORY_CHOICE]
@@ -49,7 +56,11 @@ class CreateMeeting(APIView):
             if not data.get('max_participants', None):
                 quickmatch.max_participants = 10
 
-            quickmatch.save() # 오브젝트 저장
+            quickmatch.save()  # 오브젝트 저장
+            
+            # 모임 생성자를 멤버에 추가
+            MeetingMembers.objects.create(quickmatch=quickmatch, attendant=quickmatch.organizer)
+            
             return Response({"message": "create sucess!", "meeting": repr(quickmatch)}, status=status.HTTP_200_OK)
         
         return Response({"message": "data is not available", "error": serializer.errors})
@@ -64,9 +75,9 @@ class DeleteMeeting(APIView):
     def post(self, request, quickmatchId):
         
         quickmatch = get_object_or_404(Meeting, pk=quickmatchId)
-        if quickmatch.organizer==request.user:
+        if quickmatch.organizer == request.user:
             result = {"message": "meeting deleted!",
-                        "meeting": repr(quickmatch),}
+                        "meeting": repr(quickmatch)}
             quickmatch.delete()
             return Response(result, status=status.HTTP_200_OK)
         
@@ -82,23 +93,53 @@ class JoinMeeting(APIView):
     def post(self, request, quickmatchId):
         
         quickmatch = get_object_or_404(Meeting, pk=quickmatchId)
+        user = request.user
         
-        if quickmatch.organizer == request.user:
+        if quickmatch.organizer == user:
             return Response({"message": "적절하지 않은 요청입니다."}, status=status.HTTP_400_BAD_REQUEST)
         else:
             if quickmatch.current_participants == quickmatch.max_participants:
                 return Response({"message": "the Meeting is full. You cannot join to this QuickMatch."})
+            
+            member_valid = MeetingMembers.objects.filter(quickmatch=quickmatch, attendant=user).exists()
+            
+            if member_valid:
+                return Response({"message": f"{user} is already joined."})
+            
+            quickmatch.add_participant()
+            quickmatch.save()
+            MeetingMembers.objects.create(quickmatch=quickmatch, attendant=user)
+            
+            return Response({"message": "join success!"})
+
+
+class LeaveMeeting(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request, quickmatchId):
+        return Response({"message": "GET method is not available."})
+    
+    def post(self, request, quickmatchId):
+        quickmatch = get_object_or_404(Meeting, pk=quickmatchId)
+        user = request.user
+        
+        if quickmatch.organizer == user:
+            return Response({"message": "적절하지 않은 요청입니다. 퀵매치 삭제를 해주세요."}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            if quickmatch.current_participants == quickmatch.max_participants:
+                return Response({"message": "the Meeting is full. You cannot join to this QuickMatch."})
             else:
-                quickmatch.add_participant()
+                quickmatch.remove_participant()
                 quickmatch.save()
                 
-                # meeting member 추가
-                MeetingMembers.objects.create(quickmatch=quickmatch, attendant=request.user)
-                return Response({"message": "join success!"})
-
-
+                member = MeetingMembers.objects.get(quickmatch=quickmatch, attendant=user)
+                member.delete()
+                
+                return Response({"message": "you leave this match!"})
+            
+        
 class ChangeMeetingStatus(APIView):
     permission_classes = [IsAuthenticated]
+
     def get(self, request, quickmatchId):
         return Response({"message": "GET method is not available."})
     
@@ -107,7 +148,7 @@ class ChangeMeetingStatus(APIView):
         quickmatch = get_object_or_404(Meeting, pk=quickmatchId)
         
         if quickmatch.organizer == request.user:
-            data = request.data.dict() #Querydict(수정불가)를 dict로 바꿔줌.
+            data = request.data.dict()  # Querydict(수정불가)를 dict로 바꿔줌.
             if not data.get('title', None):
                 data.update({'title': quickmatch.title})
                 print(data.get('title', 'nono'))
@@ -121,7 +162,6 @@ class ChangeMeetingStatus(APIView):
         
         else:
             return Response({"message": "적절하지 않은 요청입니다."}, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 class MeetingSearchView(ListAPIView):
@@ -153,3 +193,31 @@ class MeetingSearchView(ListAPIView):
             q_objects |= Q(title__icontains=term) | Q(location__icontains=term)
         
         return queryset.filter(q_objects)
+
+
+class MeetingDetailView(RetrieveAPIView):
+    queryset = Meeting.objects.all()
+    serializer_class = MeetingDetailSerializer
+    permission_classes = [AllowAny,]
+    lookup_field = 'pk'
+    lookup_url_kwarg = 'quickmatchId'
+
+
+class EvaluateUserView(generics.CreateAPIView):
+    queryset = UserEvaluation.objects.all()
+    serializer_class = UserEvaluationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        meeting = get_object_or_404(Meeting, pk=self.kwargs['meeting_id'])
+        evaluated_user = get_object_or_404(User, pk=self.kwargs['user_id'])
+        
+        # 평가자와 평가 대상이 동일한 모임에 참가했는지 확인
+        if self.request.user in meeting.meeting_member.all() and evaluated_user in meeting.meeting_member.all():
+            serializer.save(
+                evaluator=self.request.user,
+                evaluated=evaluated_user,
+                meeting=meeting
+            )
+        else:
+            raise serializer.ValidationError("잘못된 요청입니다.")

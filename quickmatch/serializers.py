@@ -1,6 +1,9 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from .models import Meeting, MeetingChat
+from .models import Meeting, MeetingMessage, MeetingRoom, UserEvaluation
+
+User = get_user_model()
 
 class MeetingSerializer(serializers.ModelSerializer):
     
@@ -11,6 +14,25 @@ class MeetingSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         meeting = Meeting(**validated_data)
         return meeting
+
+
+class MemberSerializer(serializers.ModelSerializer):
+    nickname = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ['nickname', 'email', 'activity_point']
+
+    def get_nickname(self, obj):
+        return obj.nickname or obj.email
+
+
+class MeetingDetailSerializer(serializers.ModelSerializer):
+    meeting_member = MemberSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Meeting
+        fields = '__all__'
 
 
 class MeetingChangeSerializer(serializers.ModelSerializer):
@@ -32,3 +54,23 @@ class MeetingChangeSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+
+class MeetingMessageSerializer(serializers.ModelSerializer):
+    class Meta():
+        model = MeetingMessage
+        fields = '__all__'
+
+
+class MeetingRoomSerializer(serializers.ModelSerializer):
+    class Meta():
+        model = MeetingRoom
+        fields = '__all__'
+
+
+class UserEvaluationSerializer(serializers.ModelSerializer):
+    evaluator = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    
+    class Meta:
+        model = UserEvaluation
+        fields = ['meeting', 'evaluator', 'evaluated', 'evaluation']

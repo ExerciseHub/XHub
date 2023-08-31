@@ -29,12 +29,11 @@ urlpatterns = [
     
     # swagger
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    
     path('player/', include('player.urls')),
     path('quickmatch/', include('quickmatch.urls')),
     path('board/', include('board.urls')),
 ]
 
-#img
+# img
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
