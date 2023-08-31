@@ -6,7 +6,9 @@ from .views import (
     LeaveMeeting,
     ChangeMeetingStatus,
     MeetingSearchView,
-    MeetingDetailView
+    MeetingDetailView,
+    JoinMeetingRoom,
+    LeaveMeetingRoom
 )
 
 app_name = 'quickmatch'
@@ -34,4 +36,10 @@ urlpatterns = [
 
     # 모임 디테일
     path('<int:quickmatchId>/detail/', MeetingDetailView.as_view(), name='meeting-detail'),
+    
+    # 모임 채팅 참가 DB 반영
+    path('<int:quickmatchId>/detail/joinchat/', JoinMeetingRoom.as_view(), name='meeting-chat-join'),
+    
+    # 모임 채팅 떠나기 DB 반영
+    path('<int:quickmatchId>/detail/leavechat/', LeaveMeetingRoom.as_view(), name='meeting-chat-leave'),
 ]
