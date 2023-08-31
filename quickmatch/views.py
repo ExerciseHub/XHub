@@ -57,6 +57,10 @@ class CreateMeeting(APIView):
                 quickmatch.max_participants = 10
 
             quickmatch.save()  # 오브젝트 저장
+            
+            # 모임 생성자를 멤버에 추가
+            MeetingMembers.objects.create(quickmatch=quickmatch, attendant=quickmatch.organizer)
+            
             return Response({"message": "create sucess!", "meeting": repr(quickmatch)}, status=status.HTTP_200_OK)
         
         return Response({"message": "data is not available", "error": serializer.errors})
@@ -89,21 +93,50 @@ class JoinMeeting(APIView):
     def post(self, request, quickmatchId):
         
         quickmatch = get_object_or_404(Meeting, pk=quickmatchId)
+        user = request.user
         
-        if quickmatch.organizer == request.user:
+        if quickmatch.organizer == user:
             return Response({"message": "적절하지 않은 요청입니다."}, status=status.HTTP_400_BAD_REQUEST)
         else:
             if quickmatch.current_participants == quickmatch.max_participants:
                 return Response({"message": "the Meeting is full. You cannot join to this QuickMatch."})
+            
+            member_valid = MeetingMembers.objects.filter(quickmatch=quickmatch, attendant=user).exists()
+            
+            if member_valid:
+                return Response({"message": f"{user} is already joined."})
+            
+            quickmatch.add_participant()
+            quickmatch.save()
+            MeetingMembers.objects.create(quickmatch=quickmatch, attendant=user)
+            
+            return Response({"message": "join success!"})
+
+
+class LeaveMeeting(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request, quickmatchId):
+        return Response({"message": "GET method is not available."})
+    
+    def post(self, request, quickmatchId):
+        quickmatch = get_object_or_404(Meeting, pk=quickmatchId)
+        user = request.user
+        
+        if quickmatch.organizer == user:
+            return Response({"message": "적절하지 않은 요청입니다. 퀵매치 삭제를 해주세요."}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            if quickmatch.current_participants == quickmatch.max_participants:
+                return Response({"message": "the Meeting is full. You cannot join to this QuickMatch."})
             else:
-                quickmatch.add_participant()
+                quickmatch.remove_participant()
                 quickmatch.save()
                 
-                # meeting member 추가
-                MeetingMembers.objects.create(quickmatch=quickmatch, attendant=request.user)
-                return Response({"message": "join success!"})
-
-
+                member = MeetingMembers.objects.get(quickmatch=quickmatch, attendant=user)
+                member.delete()
+                
+                return Response({"message": "you leave this match!"})
+            
+        
 class ChangeMeetingStatus(APIView):
     permission_classes = [IsAuthenticated]
 
