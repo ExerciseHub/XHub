@@ -3,6 +3,7 @@ from .views import (
     CreateMeeting,
     DeleteMeeting,
     JoinMeeting,
+    LeaveMeeting,
     ChangeMeetingStatus,
     MeetingSearchView,
     MeetingDetailView
@@ -19,6 +20,9 @@ urlpatterns = [
 
     # 모임 참석
     path('join/<int:quickmatchId>/', JoinMeeting.as_view(), name='join'),
+    
+    # 모임 떠나기
+    path('leave/<int:quickmatchId>/', LeaveMeeting.as_view(), name='leave'),
 
     # 모임 상태 변경
     path('<int:quickmatchId>/status/', ChangeMeetingStatus.as_view(), name='status'),
