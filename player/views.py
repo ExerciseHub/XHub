@@ -4,6 +4,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status, filters
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from django.contrib.auth.hashers import check_password
 from rest_framework.response import Response
 from rest_framework.generics import (
     CreateAPIView,
@@ -79,6 +80,26 @@ class Update(RetrieveUpdateAPIView):
     def get_object(self):
         return self.request.user
 
+    def update(self, request, *args, **kwargs):
+        current_password = request.data.get('currentPassword')
+        user = self.request.user
+
+        # 비밀번호 일치 여부 검사
+        print("Before checking password:", current_password)
+        if not check_password(current_password, user.password):
+            print("Password does not match")
+            return Response({"detail": "비밀번호가 일치하지 않습니다."}, status=status.HTTP_400_BAD_REQUEST)
+        print("Password matches")
+
+
+        serializer = self.get_serializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"detail": "회원정보가 성공적으로 수정되었습니다."}, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 class PasswordChangeView(UpdateAPIView):
     queryset = User.objects.all()
@@ -127,14 +148,15 @@ class AddFriendView(CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         friend_id = request.data.get('friend_id')
+        email = request.data.get('email')
 
         if not friend_id:
             return Response({"error": "friend_id 필드는 필수입니다."})
         
         try:
-            friend = User.objects.get(id=friend_id)
+            friend = User.objects.get(email=email)
         except User.DoesNotExist:
-            return Response({"error": "해당 ID의 사용자를 찾을 수 없습니다."})
+            return Response({"error": "해당 이메일의 사용자를 찾을 수 없습니다."})
         
         if friend == request.user:
             return Response({"error": "자신을 친구로 추가할 수 없습니다."})
