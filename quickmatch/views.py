@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 
 from rest_framework import status, generics
 from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView, RetrieveAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView, ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
@@ -193,6 +193,12 @@ class MeetingSearchView(ListAPIView):
             q_objects |= Q(title__icontains=term) | Q(location__icontains=term)
         
         return queryset.filter(q_objects)
+
+
+class MeetingListView(ListCreateAPIView):
+    queryset = Meeting.objects.all()
+    serializer_class = MeetingSerializer
+    permission_classes = [AllowAny,]
 
 
 class MeetingDetailView(RetrieveAPIView):
