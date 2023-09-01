@@ -30,6 +30,10 @@
 - docker compose run django python manage.py runserver
 ```
 
+## 프로젝트 동작 구성
+- Web 서버로 NginX
+- HTTP와 Websocket을 처리하는 서버를 gunicorn과 daphne로 따로 구성
+![Alt text](asset/system.png)
 
 ## 개발기간
 - 2023-08-18 ~ 2023-09-01
