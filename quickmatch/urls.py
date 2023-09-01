@@ -7,8 +7,12 @@ from .views import (
     ChangeMeetingStatus,
     MeetingSearchView,
     MeetingDetailView,
+<<<<<<< HEAD
     JoinMeetingRoom,
     LeaveMeetingRoom
+=======
+    MeetingListView
+>>>>>>> 44d4f98c0ac04a9724956f5124f5c666654f7237
 )
 
 app_name = 'quickmatch'
@@ -29,10 +33,11 @@ urlpatterns = [
     # 모임 상태 변경
     path('<int:quickmatchId>/status/', ChangeMeetingStatus.as_view(), name='status'),
 
+    # 모임 전체 목록 보기
+    path('list/', MeetingListView.as_view(), name='list'),
+
     # 모임 검색
     path('search/', MeetingSearchView.as_view(), name="search"),
-    
-    # path('quickmatch/<int:quickmatchId>/ws/room/', MeetingRoomConsumer.as_asgi(), name="search"),
 
     # 모임 디테일
     path('<int:quickmatchId>/detail/', MeetingDetailView.as_view(), name='meeting-detail'),
