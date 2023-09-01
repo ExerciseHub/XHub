@@ -36,9 +36,13 @@ STATICFILES_DIRS = [
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DJANGO_DEBUG')
+DEBUG = config('DJANGO_DEBUG', default=False, cast=bool)
 
+<<<<<<< HEAD
 ALLOWED_HOSTS = ['daphne', 'localhost', '127.0.0.1']
+=======
+ALLOWED_HOSTS = ['*']
+>>>>>>> 17da9ce2bf3ed5d402a70e3b020a9a66e5c24c61
 
 
 AUTHENTICATION_BACKENDS = (
@@ -199,7 +203,7 @@ USE_TZ = False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
