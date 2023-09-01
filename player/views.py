@@ -148,14 +148,15 @@ class AddFriendView(CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         friend_id = request.data.get('friend_id')
+        email = request.data.get('email')
 
         if not friend_id:
             return Response({"error": "friend_id 필드는 필수입니다."})
         
         try:
-            friend = User.objects.get(id=friend_id)
+            friend = User.objects.get(email=email)
         except User.DoesNotExist:
-            return Response({"error": "해당 ID의 사용자를 찾을 수 없습니다."})
+            return Response({"error": "해당 이메일의 사용자를 찾을 수 없습니다."})
         
         if friend == request.user:
             return Response({"error": "자신을 친구로 추가할 수 없습니다."})
