@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 
+from .tasks import enable_user_evaluation
+
 User = get_user_model()
 
 # Create your models here.
@@ -19,16 +21,17 @@ class Meeting(models.Model):
     GENDER_CHOICE = (("M", "남"), ("W", "여"), ("X", "무관"))
     gender_limit = models.CharField(choices=GENDER_CHOICE, max_length=50, default="X")
     
-    STATUS_CHOICE = (("모집중", "모집중"), ("모집완료", "모집완료"), ("모집종료", "모집종료"), ("취소", "취소"))
+    STATUS_CHOICE = (("모집중", "모집중"), ("모집완료", "모집완료"), ("취소", "취소"))
     status = models.CharField(choices=STATUS_CHOICE, max_length=50, default="모집중")
 
     location = models.CharField(max_length=255)  # 고민
     # 참여자
     meeting_member = models.ManyToManyField(User, through='MeetingMembers', related_name='quickmatches', blank=True)  # 고민
-    # meeting_member = models.CharField(max_length=255, blank=True, null=True)
 
     max_participants = models.PositiveIntegerField()
     current_participants = models.PositiveIntegerField(validators=[MinValueValidator(1)], default=1)
+
+    can_evaluate = models.BooleanField(default=False)
 
     def __repr__(self):
         return f"{self.id}:{self.title}-{self.description}-{self.created_at}"
@@ -43,13 +46,43 @@ class Meeting(models.Model):
             self.current_participants -= 1
             self.save()
 
+    def save(self, *args, **kwargs):
+        if self.pk:
+            orig = Meeting.objects.get(pk=self.pk)
+            if orig.status != self.status and self.status == "모집완료":
+                # 30분 뒤에 enable_user_evaluation 태스크를 스케줄링
+                enable_user_evaluation.apply_async(args=[self.pk], countdown=30 * 60)  # 30분 * 60초
+        super(Meeting, self).save(*args, **kwargs)
+
 
 class MeetingMembers(models.Model):
     quickmatch = models.ForeignKey('Meeting', on_delete=models.CASCADE)
     attendant = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
 
-class MeetingChat(models.Model):
-    role = models.ForeignKey("Meeting", on_delete=models.CASCADE)
-    content = models.CharField(max_length=255)  # TextFields 고려
+class MeetingRoom(models.Model):
+    name = models.CharField(max_length=255)
+    meeting = models.OneToOneField('Meeting', on_delete=models.CASCADE)
+    host = models.ForeignKey(User, on_delete=models.CASCADE, related_name="rooms")
+    current_users = models.ManyToManyField(User, related_name="current_rooms", blank=True)
+
+
+class MeetingMessage(models.Model):
+    room = models.ForeignKey("MeetingRoom", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField(max_length=500)
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.room}-message({self.user}) : {self.content}"
+
+
+class UserEvaluation(models.Model):
+    evaluator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="given_evaluations")
+    evaluated = models.ForeignKey(User, on_delete=models.CASCADE, related_name="received_evaluations")
+    meeting = models.ForeignKey(Meeting, on_delete=models.CASCADE)
+    is_positive = models.BooleanField()  # Y면 True, N이면 False
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("evaluator", "evaluated", "meeting")

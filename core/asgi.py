@@ -1,23 +1,24 @@
-"""
-ASGI config for core project.
-
-It exposes the ASGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/4.2/howto/deployment/asgi/
-"""
-
 import os
 
-from channels.routing import ProtocolTypeRouter
+from django.urls import path, re_path
 from django.core.asgi import get_asgi_application
+from channels.routing import ProtocolTypeRouter, URLRouter
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
-# Initialize Django ASGI application early to ensure the AppRegistry
-# is populated before importing code that may import ORM models.
 django_asgi_app = get_asgi_application()
 
+
+from django.urls import path, re_path
+from quickmatch.consumers import MeetingRoomConsumer
+from player.consumers import ChatConsumer
+from channels_jwt_auth_middleware.auth import JWTAuthMiddlewareStack
+# from channels.security.websocket import AllowedHostsOriginValidator
+
 application = ProtocolTypeRouter({
-    "http": django_asgi_app,
-    # Just HTTP for now. (We can add other protocols later.)
+    "websocket": JWTAuthMiddlewareStack(
+        URLRouter([
+            re_path(r'ws/chat/(?P<user_id_1>\d+)/(?P<user_id_2>\d+)/$', ChatConsumer.as_asgi()),
+            re_path(r'ws/quickmatch/(?P<quickmatchId>\d+)/room/$', MeetingRoomConsumer.as_asgi()),
+        ]),
+    ),
 })

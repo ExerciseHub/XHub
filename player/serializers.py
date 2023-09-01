@@ -1,9 +1,10 @@
+from datetime import datetime
+
 from rest_framework import serializers
 from django.contrib.auth import authenticate
+from django.contrib.auth.hashers import check_password
 
-from .models import User
-from django.contrib.auth import authenticate
-from .models import User
+from .models import User, DMRoom, DirectMessage
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -44,7 +45,7 @@ class LoginSerializer(serializers.Serializer):
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True, required=False)
 
     class Meta:
         model = User
@@ -77,3 +78,55 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             instance.save()
 
             return instance
+        
+        def validate_current_password(self, value):
+            user = self.context['request'].user
+            if not check_password(value, user.password):
+                raise serializers.ValidationError('현재 비밀번호가 맞지 않습니다.')
+            return value
+
+
+class MessageSerializer(serializers.ModelSerializer):
+    created_at_formatted = serializers.SerializerMethodField()
+    user = UserSerializer()
+
+    class Meta:
+        model = DirectMessage
+        exclude = []
+        depth = 1
+
+    def get_created_at_formatted(self, obj):
+        # 만약 obj.created_at이 문자열이면 그대로 반환합니다.
+        if isinstance(obj.created_at, str):
+            return obj.created_at
+        # 만약 obj.created_at이 datetime 객체면, 포맷에 맞게 변환해서 반환합니다.
+        elif isinstance(obj.created_at, datetime):
+            return obj.created_at.strftime("%Y-%m-%d %H:%M%S")
+        # 그 외의 경우에는 None을 반환합니다.
+        else:
+            return None
+
+
+class RoomSerializer(serializers.ModelSerializer):
+    last_message = serializers.SerializerMethodField()
+    messages = MessageSerializer(read_only=True)
+
+    class Meta:
+        model = DMRoom
+        fields = ["pk", "name", "host", "messages", "current_users", "last_message"]
+        depth = 1
+        read_only_fields = ["messages", "last_message"]
+
+    def get_last_message(self, obj):
+        return MessageSerializer(obj.messages.order_by('created_at').last()).data
+
+
+class PasswordChangeSerializer(serializers.Serializer):
+    current_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
+    def validate_current_password(self, value):
+        if not check_password(value, self.context['request'].user.password):
+            raise serializers.ValidationError('현재 비밀번호가 맞지 않습니다.')
+        return value
+

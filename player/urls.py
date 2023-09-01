@@ -1,5 +1,4 @@
 from django.urls import path
-from .views import RegisterView, UnregisterUserView
 from .views import (
     RegisterView,
     Login,
@@ -10,7 +9,10 @@ from .views import (
     FriendListView,
     AddFriendView,
     RemoveFriendView,
-    )
+    MessageListView,
+    CreateRoomView,
+    PasswordChangeView,
+)
 
 app_name = "player"
 
@@ -29,7 +31,10 @@ urlpatterns = [
 
     # 회원 정보수정
     # path('update/', Update, name='update'),
-    path('<int:id>/update/', Update.as_view(), name='update'),
+    path('update/', Update.as_view(), name='update'),
+
+    # 비밀번호 수정
+    path('update/ps/', PasswordChangeView.as_view(), name='pw_change'),
 
     # 회원 탈퇴
     # path("<str:playerId>/", 기능, name="remove"),
@@ -45,5 +50,11 @@ urlpatterns = [
     path('add-friend/', AddFriendView.as_view(), name='add_friend'),
 
     # 친구 삭제
-    path('rm-friend/<int:friend_id>/', RemoveFriendView.as_view(), name='rm-friend')
+    path('rm-friend/<int:friend_id>/', RemoveFriendView.as_view(), name='rm-friend'),
+
+    # 채팅 목록
+    path('chat-room/<int:room_id>/', MessageListView.as_view(), name="chat"),
+
+    # 채팅방 생성
+    path('chat-room/create/', CreateRoomView.as_view(), name='create_room'),
 ]
