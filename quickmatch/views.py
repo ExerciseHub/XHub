@@ -115,6 +115,7 @@ class JoinMeeting(APIView):
 
 class LeaveMeeting(APIView):
     permission_classes = [IsAuthenticated]
+    
     def get(self, request, quickmatchId):
         return Response({"message": "GET method is not available."})
     

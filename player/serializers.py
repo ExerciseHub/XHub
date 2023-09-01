@@ -129,4 +129,3 @@ class PasswordChangeSerializer(serializers.Serializer):
         if not check_password(value, self.context['request'].user.password):
             raise serializers.ValidationError('현재 비밀번호가 맞지 않습니다.')
         return value
-

@@ -9,8 +9,8 @@ from channels.db import database_sync_to_async
 # from djangochannelsrestframework.observer.generics import ObserverModelInstanceMixin, action
 
 from .models import MeetingMembers, MeetingMessage, MeetingRoom, User
-from .serializers import MeetingMessageSerializer, MeetingRoomSerializer
-from player.serializers import UserSerializer
+# from .serializers import MeetingMessageSerializer, MeetingRoomSerializer
+# from player.serializers import UserSerializer
 
 
 class MeetingRoomConsumerTest(WebsocketConsumer):
@@ -87,7 +87,7 @@ class MeetingRoomConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
 
-        #회원 멤버인지 확인
+        # 회원 멤버인지 확인
         self.members_email = await self.get_members_email()
         
         # Send message to room group
@@ -114,7 +114,7 @@ class MeetingRoomConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def get_members_email(self):
         members = MeetingMembers.objects.filter(quickmatch=self.room_name)
-        members_email = [ i.attendant.email for i in members]
+        members_email = [i.attendant.email for i in members]
         return members_email
     
     @database_sync_to_async
@@ -124,10 +124,8 @@ class MeetingRoomConsumer(AsyncWebsocketConsumer):
         meetingid = self.scope["url_route"]["kwargs"]["quickmatchId"]
         meetingroom = MeetingRoom.objects.get(meeting=meetingid)
         MeetingMessage.objects.create(room=meetingroom, user=user, content=message)
-    
-    
-    
-    
+
+
 # class MeetingRoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
 #     queryset = MeetingRoom.objects.all()
 #     serializer_class = MeetingRoomSerializer
