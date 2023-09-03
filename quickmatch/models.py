@@ -36,6 +36,9 @@ class Meeting(models.Model):
     def __repr__(self):
         return f"{self.id}:{self.title}-{self.description}-{self.created_at}"
     
+    def __str__(self):
+        return f"{self.id}:{self.title}-{self.description}-{self.created_at}"
+    
     def add_participant(self):
         if self.current_participants < self.max_participants:
             self.current_participants += 1
@@ -58,6 +61,12 @@ class Meeting(models.Model):
 class MeetingMembers(models.Model):
     quickmatch = models.ForeignKey('Meeting', on_delete=models.CASCADE)
     attendant = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    
+    def __str__(self):
+        return f"meeting:{self.quickmatch.id} , user:{self.attendant.id}"
+    
+    def __repr__(self):
+        return f"meeting:{self.quickmatch} , user:{self.attendant}"
 
 
 class MeetingRoom(models.Model):
@@ -65,6 +74,9 @@ class MeetingRoom(models.Model):
     meeting = models.OneToOneField('Meeting', on_delete=models.CASCADE)
     host = models.ForeignKey(User, on_delete=models.CASCADE, related_name="rooms")
     current_users = models.ManyToManyField(User, related_name="current_rooms", blank=True)
+    
+    def __str__(self):
+        return f'id: {self.id}, name: {self.name}, host:{self.host}'
 
 
 class MeetingMessage(models.Model):
@@ -74,7 +86,7 @@ class MeetingMessage(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f"{self.room}-message({self.user}) : {self.content}"
+        return f"{self.room.id}-({self.user.id}) : {self.content}"
 
 
 class UserEvaluation(models.Model):
