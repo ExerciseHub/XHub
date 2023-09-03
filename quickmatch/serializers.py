@@ -66,6 +66,10 @@ class MeetingRoomSerializer(serializers.ModelSerializer):
     class Meta():
         model = MeetingRoom
         fields = '__all__'
+        
+    def create(self, validated_data):
+        meeting_room = MeetingRoom(**validated_data)
+        return meeting_room
 
 
 class UserEvaluationSerializer(serializers.ModelSerializer):
