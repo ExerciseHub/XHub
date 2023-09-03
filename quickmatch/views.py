@@ -4,24 +4,27 @@ from django.contrib.auth import get_user_model
 
 from rest_framework import status, generics
 from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView, RetrieveAPIView, ListCreateAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView, ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from .models import (
     Meeting,
     MeetingMembers,
+    MeetingRoom,
+    MeetingMessage,
     UserEvaluation,
 )
 from .serializers import (
     MeetingSerializer,
+    MeetingRoomSerializer,
     MeetingChangeSerializer,
     MeetingDetailSerializer,
     UserEvaluationSerializer,
 )
 
-
 User = get_user_model()
+
 
 class CreateMeeting(APIView):
     permission_classes = [IsAuthenticated]
@@ -61,7 +64,9 @@ class CreateMeeting(APIView):
             # 모임 생성자를 멤버에 추가
             MeetingMembers.objects.create(quickmatch=quickmatch, attendant=quickmatch.organizer)
             
-            return Response({"message": "create sucess!", "meeting": repr(quickmatch)}, status=status.HTTP_200_OK)
+            MeetingRoom.objects.create(meeting=quickmatch, name=f"{quickmatch.title}_chatroom", host=quickmatch.organizer)
+            
+            return Response({"message": "create success!", "meeting": repr(quickmatch)}, status=status.HTTP_200_OK)
         
         return Response({"message": "data is not available", "error": serializer.errors})
 
@@ -78,6 +83,7 @@ class DeleteMeeting(APIView):
         if quickmatch.organizer == request.user:
             result = {"message": "meeting deleted!",
                         "meeting": repr(quickmatch)}
+            
             quickmatch.delete()
             return Response(result, status=status.HTTP_200_OK)
         
@@ -115,6 +121,7 @@ class JoinMeeting(APIView):
 
 class LeaveMeeting(APIView):
     permission_classes = [IsAuthenticated]
+    
     def get(self, request, quickmatchId):
         return Response({"message": "GET method is not available."})
     
@@ -135,8 +142,8 @@ class LeaveMeeting(APIView):
                 member.delete()
                 
                 return Response({"message": "you leave this match!"})
-            
-        
+
+
 class ChangeMeetingStatus(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -209,7 +216,7 @@ class MeetingDetailView(RetrieveAPIView):
     lookup_url_kwarg = 'quickmatchId'
 
 
-class EvaluateUserView(generics.CreateAPIView):
+class EvaluateUserView(CreateAPIView):
     queryset = UserEvaluation.objects.all()
     serializer_class = UserEvaluationSerializer
     permission_classes = [IsAuthenticated]
@@ -227,3 +234,42 @@ class EvaluateUserView(generics.CreateAPIView):
             )
         else:
             raise serializer.ValidationError("잘못된 요청입니다.")
+
+
+class JoinMeetingRoom(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, quickmatchId):
+        meeting = get_object_or_404(Meeting, pk=quickmatchId)
+        user = request.user
+        result = MeetingRoom.objects.filter(meeting=meeting).exists()
+        
+        if result:
+            meeting_room = meeting.meetingroom
+            try:
+                meeting_room.current_users.add(user)
+                return Response({"message": f"you join to {meeting_room.name} meeting chat room successful."}, status=status.HTTP_200_OK)
+            except TypeError:
+                return Response({"message": "wrong addition."})
+        
+        return Response({"message": "meetingroom is not exist."}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LeaveMeetingRoom(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, quickmatchId):
+        meeting = get_object_or_404(Meeting, pk=quickmatchId)
+        user = request.user
+        result = MeetingRoom.objects.filter(meeting=meeting).exists()
+        
+        if result:
+            meeting_room = meeting.meetingroom
+            try:
+                meeting_room.current_users.remove(user)
+                
+                return Response({"message": f"{meeting_room.current_users.all()}"}, status=status.HTTP_200_OK)
+            except TypeError:
+                return Response({"message": "wrong addition."})
+        
+        return Response({"message": "meetingroom is not exist."}, status=status.HTTP_400_BAD_REQUEST)
