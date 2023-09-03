@@ -16,8 +16,20 @@
 - 1회성 운동 모임이 끝나면 사용자의 활동 점수에 영향이 가는 2중 선택지 평가를 하여, 매너 사용자와 비매너 사용자를 확인할 수도 있습니다.
 - 1회성 운동 모임으로 운동도 즐길 수 있고, 게시판에서 운동에 관한 건강한 정보를 공유할 수도 있습니다.
 
+
+## 프로젝트 구성도
+- Web 서버로 NginX
+- HTTP와 Websocket을 처리하는 서버를 gunicorn과 daphne로 따로 구성
+![Alt text](asset/system.png)
+
+
+## 프로젝트 흐름도
+![Alt text](asset/flowchart.png)
+
+
 ## 개발 환경
 - Docker, Ubuntu 22.04, 2 vCPU, 2G(RAM)
+
 
 ## 프로젝트 실행 방법
 ```
@@ -29,11 +41,6 @@
 - docker compose run django python manage.py migrate
 - docker compose run django python manage.py runserver
 ```
-
-## 프로젝트 동작 구성
-- Web 서버로 NginX
-- HTTP와 Websocket을 처리하는 서버를 gunicorn과 daphne로 따로 구성
-![Alt text](asset/system.png)
 
 ## 개발기간
 - 2023-08-18 ~ 2023-09-01
