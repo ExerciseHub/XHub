@@ -48,7 +48,7 @@ class CreateMeeting(APIView):
                 quickmatch.category = category_list[0]
                 
             if not data.get('gender_limit', None):
-                quickmatch.category = gender_list[2]
+                quickmatch.gender_limit = gender_list[2]
                 
             if not data.get('status', None):
                 quickmatch.status = status_list[0]
