@@ -38,11 +38,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DJANGO_DEBUG')
 
-<<<<<<< HEAD
 ALLOWED_HOSTS = ['daphne', 'localhost', '127.0.0.1']
-=======
-ALLOWED_HOSTS = ['*']
->>>>>>> 17da9ce2bf3ed5d402a70e3b020a9a66e5c24c61
 
 
 AUTHENTICATION_BACKENDS = (
@@ -114,6 +110,7 @@ REST_FRAMEWORK = {
 }
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -122,15 +119,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
-    'corsheaders.middleware.CorsMiddleware',
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
-
-# CORS_ALLOWED_ORIGINS = [
-#     "https://exercisehub.github.io/XHub-Client",
-#     "https://aminsc.github.io/XHub-Client",
-# ]
 
 
 ROOT_URLCONF = 'core.urls'
