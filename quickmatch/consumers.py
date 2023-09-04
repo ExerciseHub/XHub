@@ -1,18 +1,9 @@
 import json
 
-from asgiref.sync import async_to_sync
-from channels.generic.websocket import WebsocketConsumer, AsyncWebsocketConsumer
+from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 
-# from djangochannelsrestframework.generics import GenericAsyncAPIConsumer
-# from djangochannelsrestframework.observer import model_observer
-# from djangochannelsrestframework.observer.generics import ObserverModelInstanceMixin, action
-
-from .models import MeetingMembers, MeetingMessage, MeetingRoom, User
-# from .serializers import MeetingMessageSerializer, MeetingRoomSerializer
-# from player.serializers import UserSerializer
-
-from urllib.parse import parse_qs
+from .models import MeetingMembers, MeetingMessage, MeetingRoom
 
 
 class MeetingRoomConsumer(AsyncWebsocketConsumer):
@@ -40,11 +31,8 @@ class MeetingRoomConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
 
-
         self.members_email = await self.get_members_email()
-        
-        
-        
+
         if self.user.email in self.members_email:
             # Send message to room group
             await self.channel_layer.group_send(
@@ -94,15 +82,3 @@ class MeetingRoomConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def join_to_meetingroom(self):
         pass
-    
-    @database_sync_to_async
-    def join_to_meetingroom(self):
-        pass
-    
-    
-    # @database_sync_to_async
-    # def load_recent_conversation(self):
-    #     conversations = MeetingMessage.objects.all().order_by('-created_at')
-    #     pass
-    
-    
