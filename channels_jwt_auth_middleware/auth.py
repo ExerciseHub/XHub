@@ -1,5 +1,4 @@
 import traceback
-from urllib.parse import parse_qs
 
 from channels.auth import AuthMiddlewareStack
 from channels.db import database_sync_to_async
@@ -22,8 +21,6 @@ class JWTAuthMiddleware:
         close_old_connections()
         try:
             if jwt_token_list := scope.get("headers", []):
-            # if(jwt_token_list := parse_qs(scope["query_string"].decode("utf8")).get('token', None)):
-                # jwt_token = jwt_token_list[0]
                 for key, value in jwt_token_list:
                     if key == b'authorization':
                         jwt_token = value.decode('utf-8').split(' ')[1]

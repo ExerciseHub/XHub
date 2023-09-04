@@ -2,7 +2,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 
-from rest_framework import status, generics
+from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView, ListCreateAPIView
 from rest_framework.response import Response
@@ -12,12 +12,10 @@ from .models import (
     Meeting,
     MeetingMembers,
     MeetingRoom,
-    MeetingMessage,
     UserEvaluation,
 )
 from .serializers import (
     MeetingSerializer,
-    MeetingRoomSerializer,
     MeetingChangeSerializer,
     MeetingDetailSerializer,
     UserEvaluationSerializer,
@@ -132,15 +130,16 @@ class LeaveMeeting(APIView):
         if quickmatch.organizer == user:
             return Response({"message": "적절하지 않은 요청입니다. 퀵매치 삭제를 해주세요."}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            if quickmatch.current_participants == quickmatch.max_participants:
-                return Response({"message": "the Meeting is full. You cannot join to this QuickMatch."})
+            member_exists = MeetingMembers.objects.filter(quickmatch=quickmatch, attendant=user).exists()
+            if not member_exists:
+                return Response({"message": "You are not a member of this match."}, status=status.HTTP_400_BAD_REQUEST)
             else:
                 quickmatch.remove_participant()
                 quickmatch.save()
                 
                 member = MeetingMembers.objects.get(quickmatch=quickmatch, attendant=user)
                 member.delete()
-                
+            
                 return Response({"message": "you leave this match!"})
 
 
@@ -273,3 +272,16 @@ class LeaveMeetingRoom(APIView):
                 return Response({"message": "wrong addition."})
         
         return Response({"message": "meetingroom is not exist."}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class IsMemberView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, meeting_id):
+        user = request.user
+        meeting = get_object_or_404(Meeting, pk=meeting_id)
+
+        # 사용자가 지정된 회의의 회원인지 확인
+        is_member = meeting.meeting_member.filter(id=user.id).exists()
+
+        return Response({'is_member': is_member})
