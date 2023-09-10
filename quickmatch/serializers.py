@@ -27,6 +27,7 @@ class MemberSerializer(serializers.ModelSerializer):
         return obj.nickname or obj.email
 
 
+# TODO - dtail 전달될 때 전달하는 항목 지정, organizer eamil로 전달?
 class MeetingDetailSerializer(serializers.ModelSerializer):
     meeting_member = MemberSerializer(many=True, read_only=True)
 
@@ -41,7 +42,6 @@ class MeetingChangeSerializer(serializers.ModelSerializer):
         fields = ['title', 'description', 'status', 'age_limit', 'category', 'gender_limit', 'max_participants']
     
     def update(self, instance, validated_data):
-        print('hi there!')
         print(validated_data)
         
         instance.title = validated_data.get('title', instance.title)

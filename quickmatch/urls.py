@@ -8,7 +8,8 @@ from .views import (
     MeetingSearchView,
     MeetingDetailView,
     JoinMeetingRoom,
-    LeaveMeetingRoom
+    LeaveMeetingRoom,
+    MeetingListView
 )
 
 app_name = 'quickmatch'
@@ -32,7 +33,8 @@ urlpatterns = [
     # 모임 검색
     path('search/', MeetingSearchView.as_view(), name="search"),
     
-    # path('quickmatch/<int:quickmatchId>/ws/room/', MeetingRoomConsumer.as_asgi(), name="search"),
+    # 모임 목록
+    path('list/', MeetingListView.as_view(), name='list'),
 
     # 모임 디테일
     path('<int:quickmatchId>/detail/', MeetingDetailView.as_view(), name='meeting-detail'),

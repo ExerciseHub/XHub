@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 
 from rest_framework import status, generics
 from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView, ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
@@ -207,6 +207,12 @@ class MeetingDetailView(RetrieveAPIView):
     permission_classes = [AllowAny,]
     lookup_field = 'pk'
     lookup_url_kwarg = 'quickmatchId'
+
+
+class MeetingListView(ListCreateAPIView):
+    queryset = Meeting.objects.all()
+    serializer_class = MeetingSerializer
+    permission_classes = [AllowAny,]
 
 
 class EvaluateUserView(CreateAPIView):
