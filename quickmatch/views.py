@@ -51,7 +51,7 @@ class CreateMeeting(APIView):
                 quickmatch.category = category_list[0]
                 
             if not data.get('gender_limit', None):
-                quickmatch.category = gender_list[2]
+                quickmatch.gender_limit = gender_list[2]
                 
             if not data.get('status', None):
                 quickmatch.status = status_list[0]
@@ -121,6 +121,7 @@ class JoinMeeting(APIView):
 
 class LeaveMeeting(APIView):
     permission_classes = [IsAuthenticated]
+    
     def get(self, request, quickmatchId):
         return Response({"message": "GET method is not available."})
     
@@ -199,6 +200,12 @@ class MeetingSearchView(ListAPIView):
             q_objects |= Q(title__icontains=term) | Q(location__icontains=term)
         
         return queryset.filter(q_objects)
+
+
+class MeetingListView(ListCreateAPIView):
+    queryset = Meeting.objects.all()
+    serializer_class = MeetingSerializer
+    permission_classes = [AllowAny,]
 
 
 class MeetingDetailView(RetrieveAPIView):

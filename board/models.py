@@ -11,7 +11,7 @@ class Post(models.Model):
     gather_title = models.CharField(max_length=100)
     writer = models.ForeignKey(User, on_delete=models.CASCADE)
     context = models.TextField()
-    img = models.ImageField(blank=True, null=True)
+    img = models.ImageField(upload_to='images/post/', blank=True, null=True)
     like = models.PositiveIntegerField(default=0)
     public = models.BooleanField(default=True)  # 공개 여부
     created_at = models.DateTimeField(auto_now_add=True)

@@ -9,8 +9,8 @@ from channels.db import database_sync_to_async
 # from djangochannelsrestframework.observer.generics import ObserverModelInstanceMixin, action
 
 from .models import MeetingMembers, MeetingMessage, MeetingRoom, User
-from .serializers import MeetingMessageSerializer, MeetingRoomSerializer
-from player.serializers import UserSerializer
+# from .serializers import MeetingMessageSerializer, MeetingRoomSerializer
+# from player.serializers import UserSerializer
 
 from urllib.parse import parse_qs
 
@@ -39,6 +39,7 @@ class MeetingRoomConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
+
 
         self.members_email = await self.get_members_email()
         
@@ -79,7 +80,7 @@ class MeetingRoomConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def get_members_email(self):
         members = MeetingMembers.objects.filter(quickmatch=self.room_name)
-        members_email = [ i.attendant.email for i in members]
+        members_email = [i.attendant.email for i in members]
         return members_email
     
     @database_sync_to_async
