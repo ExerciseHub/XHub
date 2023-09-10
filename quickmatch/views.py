@@ -216,6 +216,12 @@ class MeetingDetailView(RetrieveAPIView):
     lookup_url_kwarg = 'quickmatchId'
 
 
+class MeetingListView(ListCreateAPIView):
+    queryset = Meeting.objects.all()
+    serializer_class = MeetingSerializer
+    permission_classes = [AllowAny,]
+
+
 class EvaluateUserView(CreateAPIView):
     queryset = UserEvaluation.objects.all()
     serializer_class = UserEvaluationSerializer

@@ -12,6 +12,7 @@ from .views import (
     MessageListView,
     CreateRoomView,
     PasswordChangeView,
+    CheckLoginUserEmail
 )
 
 app_name = "player"
@@ -57,4 +58,7 @@ urlpatterns = [
 
     # 채팅방 생성
     path('chat-room/create/', CreateRoomView.as_view(), name='create_room'),
+    
+    # 로그인된 유저 확인
+    path('check/email/', CheckLoginUserEmail.as_view(), name='check_user'),
 ]
