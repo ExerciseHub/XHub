@@ -3,6 +3,7 @@ from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated, AllowAny, BasePermission
 from rest_framework.response import Response
 from rest_framework import status, permissions
+from rest_framework.pagination import PageNumberPagination
 
 from .models import Post, Comment
 from .serializers import PostSerializers, CommentSerializer
@@ -20,13 +21,19 @@ class PostCreateView(CreateAPIView):
         serializer.save(writer=self.request.user)  # 로그인 한 유저가 작성자로 저장
 
 
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 1000
+
 class PostListView(ListAPIView):
     permission_classes = [AllowAny,]
     queryset = Post.objects.all()
     serializer_class = PostSerializers
     filter_backends = [OrderingFilter]
-    ordering_fields = ['created_at', 'like']  # 어떤 필드에 대해 정렬할지 지정
-    ordering = ['-created_at']  # 기본 정렬 방식은 최신 게시글
+    ordering_fields = ['created_at', 'like']
+    ordering = ['-created_at']
+    pagination_class = StandardResultsSetPagination
 
 
 class PostDetailView(RetrieveAPIView):
