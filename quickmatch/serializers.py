@@ -19,12 +19,17 @@ class MeetingSerializer(serializers.ModelSerializer):
 class MemberSerializer(serializers.ModelSerializer):
     nickname = serializers.SerializerMethodField()
 
+    position_display = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ['nickname', 'email', 'activity_point']
+        fields = ['nickname', 'email', 'activity_point', 'position', 'position_display']
 
     def get_nickname(self, obj):
         return obj.nickname or obj.email
+    
+    def get_position_display(self, obj):
+        return obj.get_position_display()
 
 
 class MeetingDetailSerializer(serializers.ModelSerializer):
