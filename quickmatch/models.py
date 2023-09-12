@@ -54,7 +54,7 @@ class Meeting(models.Model):
             orig = Meeting.objects.get(pk=self.pk)
             if orig.status != self.status and self.status == "모집완료":
                 # 30분 뒤에 enable_user_evaluation 태스크를 스케줄링
-                enable_user_evaluation.apply_async(args=[self.pk], countdown=30 * 60)  # 30분 * 60초
+                enable_user_evaluation.apply_async(args=[self.pk], countdown=5 * 60)  # 5분 * 60초
         super(Meeting, self).save(*args, **kwargs)
 
 
