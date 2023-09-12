@@ -215,6 +215,7 @@ class MeetingDetailView(RetrieveAPIView):
     lookup_url_kwarg = 'quickmatchId'
 
 
+
 class EvaluateMemberView(APIView):
     permission_classes = [IsAuthenticated]
 

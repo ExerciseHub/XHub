@@ -264,3 +264,12 @@ class CreateRoomView(CreateAPIView):
             return Response({"message": "채팅방 생성!", "room_id": room.id}, status=status.HTTP_201_CREATED)
         else:
             return Response({"message": "이미 존재하는 채팅방입니다.", "room_id": room.id}, status=status.HTTP_200_OK)
+
+
+class CheckLoginUserEmail(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        user = request.user
+        return Response({"email": user.email, "id": user.pk }, status=status.HTTP_200_OK)
+    
