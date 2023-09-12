@@ -28,8 +28,18 @@ class MeetingRoomConsumer(AsyncWebsocketConsumer):
             self.channel_name
         )
         await self.accept()
+        
+        await self.channel_layer.group_send({
+            'msg_type' : 'info',
+            'message' : f'{self.user.email} 님이 채팅에 참석했습니다.'
+        })
 
     async def disconnect(self, close_code):
+        await self.channel_layer.group_send({
+            'msg_type' : 'info',
+            'message' : f'{self.user.email} 님이 채팅에tj 떠났습니다.'
+        })
+        
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
@@ -39,11 +49,8 @@ class MeetingRoomConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
-
-
+        
         self.members_email = await self.get_members_email()
-        
-        
         
         if self.user.email in self.members_email:
             # Send message to room group
@@ -69,13 +76,14 @@ class MeetingRoomConsumer(AsyncWebsocketConsumer):
 
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
+            'msg_type' : 'message',
             'message': message,
             'room_id': room_id,
             'group_member': group_member,
             'sender_email': user_email
         }))
         # save to database
-        await self.save_message(self.user, room_id, message)
+        await self.save_message(user=self.user, room_id=room_id, message=message)
     
     @database_sync_to_async
     def get_members_email(self):
@@ -85,20 +93,10 @@ class MeetingRoomConsumer(AsyncWebsocketConsumer):
     
     @database_sync_to_async
     def save_message(self, user, room_id, message):
-        # user_email = event['email']
-        # user = User.objects.get(email=user_email)
+        user = User.objects.get(pk=user)
         meetingroom = MeetingRoom.objects.get(meeting=room_id)
         
         MeetingMessage.objects.create(room=meetingroom, user=user, content=message)
-    
-    @database_sync_to_async
-    def join_to_meetingroom(self):
-        pass
-    
-    @database_sync_to_async
-    def join_to_meetingroom(self):
-        pass
-    
     
     # @database_sync_to_async
     # def load_recent_conversation(self):

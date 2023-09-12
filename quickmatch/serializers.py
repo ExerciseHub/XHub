@@ -27,7 +27,7 @@ class MemberSerializer(serializers.ModelSerializer):
         return obj.nickname or obj.email
 
 
-# TODO - dtail 전달될 때 전달하는 항목 지정, organizer eamil로 전달?
+# TODO - detail 전달될 때 전달하는 항목 지정, organizer eamil로 전달?
 class MeetingDetailSerializer(serializers.ModelSerializer):
     meeting_member = MemberSerializer(many=True, read_only=True)
 
