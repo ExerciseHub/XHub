@@ -1,18 +1,9 @@
 import json
 
-from asgiref.sync import async_to_sync
-from channels.generic.websocket import WebsocketConsumer, AsyncWebsocketConsumer
+from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 
-# from djangochannelsrestframework.generics import GenericAsyncAPIConsumer
-# from djangochannelsrestframework.observer import model_observer
-# from djangochannelsrestframework.observer.generics import ObserverModelInstanceMixin, action
-
-from .models import MeetingMembers, MeetingMessage, MeetingRoom, User
-# from .serializers import MeetingMessageSerializer, MeetingRoomSerializer
-# from player.serializers import UserSerializer
-
-from urllib.parse import parse_qs
+from .models import MeetingMembers, MeetingMessage, MeetingRoom
 
 
 class MeetingRoomConsumer(AsyncWebsocketConsumer):
