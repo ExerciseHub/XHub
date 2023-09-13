@@ -223,6 +223,12 @@ class EvaluateMemberView(APIView):
         member = get_object_or_404(User, id=member_id)
         meeting = get_object_or_404(Meeting, id=meeting_id)
 
+        if not meeting.meeting_member.filter(id=request.user.id).exists():
+            return Response({'status': '멤버만 평가할 수 있습니다.'}, status=status.HTTP_403_FORBIDDEN)
+        
+        if request.user.id == member_id:
+            return Response({'status': '본인을 평가할 수 없습니다.'}, status=status.HTTP_400_BAD_REQUEST)
+
         # 해당 멤버와 모임에 대한 평가가 이미 있는지 확인
         evaluation_exists = UserEvaluation.objects.filter(
             evaluator=request.user, 
