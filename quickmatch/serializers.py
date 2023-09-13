@@ -23,7 +23,7 @@ class MemberSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['nickname', 'email', 'activity_point', 'position', 'position_display']
+        fields = ['id', 'nickname', 'email', 'activity_point', 'position', 'position_display']
 
     def get_nickname(self, obj):
         return obj.nickname or obj.email
