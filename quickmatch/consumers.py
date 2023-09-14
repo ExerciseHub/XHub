@@ -1,11 +1,12 @@
 import json
+from collections import OrderedDict
 
 from django.contrib.auth import get_user_model
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 
 from .models import MeetingMembers, MeetingMessage, MeetingRoom
-
+from .serializers import MeetingMessageSerializer
 
 User = get_user_model()
 
@@ -23,6 +24,8 @@ class MeetingRoomConsumer(AsyncWebsocketConsumer):
             self.channel_name
         )
         await self.accept()
+        
+        await self.change_recent_conversations(self.room_name)
         
         await self.channel_layer.group_send(
             self.room_group_name,
@@ -99,6 +102,10 @@ class MeetingRoomConsumer(AsyncWebsocketConsumer):
             'sender_email': 'system'
         }))
     
+    async def change_recent_conversations(self, room_id):
+        str_data = await self.load_recent_conversations(room_id)
+        await self.send(text_data=str_data)
+    
     @database_sync_to_async
     def get_members_email(self):
         members = MeetingMembers.objects.filter(quickmatch=self.room_name)
@@ -112,9 +119,15 @@ class MeetingRoomConsumer(AsyncWebsocketConsumer):
         
         MeetingMessage.objects.create(room=meetingroom, user=user, content=message)
     
-    # @database_sync_to_async
-    # def load_recent_conversation(self):
-    #     conversations = MeetingMessage.objects.all().order_by('-created_at')
-    #     pass
+    @database_sync_to_async
+    def load_recent_conversations(self, room_id):
+        conversations = MeetingMessage.objects.filter(room=room_id).order_by('created_at')
+        serializer = MeetingMessageSerializer(conversations, many=True)
+        data = serializer.data
+        # data.append(OrderedDict({"msg_type":"load"}))
+        str_data = json.dumps(data, ensure_ascii=False)
+        return str_data
+        # result = [dict(OrderedDict(i)) for i in serializer.data]
+        # return result
     
     
