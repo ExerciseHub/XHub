@@ -50,6 +50,24 @@ CHANNEL_LAYERS = {
     },
 }
 
+# 로깅세팅
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'websocket': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django.channels': {
+            'handlers': ['websocket'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}
 
 # Celery configurations
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
