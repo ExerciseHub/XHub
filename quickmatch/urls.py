@@ -10,7 +10,8 @@ from .views import (
     JoinMeetingRoom,
     LeaveMeetingRoom,
     MeetingListView,
-    IsMemberView
+    IsMemberView,
+    EvaluateMemberView,
 )
 
 app_name = 'quickmatch'
@@ -36,6 +37,9 @@ urlpatterns = [
 
     # 모임 검색
     path('search/', MeetingSearchView.as_view(), name="search"),
+    
+    # 모임 목록
+    path('list/', MeetingListView.as_view(), name='list'),
 
     # 모임 디테일
     path('<int:quickmatchId>/detail/', MeetingDetailView.as_view(), name='meeting-detail'),
@@ -48,4 +52,7 @@ urlpatterns = [
 
     # 모임 여부 확인
     path('is_member/<int:meeting_id>/', IsMemberView.as_view(), name='is_member'),
+
+    # 모임 맴버 평가
+    path('evaluate_member/<int:member_id>/<int:meeting_id>/', EvaluateMemberView.as_view(), name='evaluate_member'),
 ]
