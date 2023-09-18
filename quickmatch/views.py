@@ -215,24 +215,42 @@ class MeetingDetailView(RetrieveAPIView):
     lookup_url_kwarg = 'quickmatchId'
 
 
-class EvaluateUserView(CreateAPIView):
-    queryset = UserEvaluation.objects.all()
-    serializer_class = UserEvaluationSerializer
+
+class EvaluateMemberView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        meeting = get_object_or_404(Meeting, pk=self.kwargs['meeting_id'])
-        evaluated_user = get_object_or_404(User, pk=self.kwargs['user_id'])
+    def post(self, request, member_id, meeting_id):
+        member = get_object_or_404(User, id=member_id)
+        meeting = get_object_or_404(Meeting, id=meeting_id)
+
+        if not meeting.meeting_member.filter(id=request.user.id).exists():
+            return Response({'status': '멤버만 평가할 수 있습니다.'}, status=status.HTTP_403_FORBIDDEN)
         
-        # 평가자와 평가 대상이 동일한 모임에 참가했는지 확인
-        if self.request.user in meeting.meeting_member.all() and evaluated_user in meeting.meeting_member.all():
-            serializer.save(
-                evaluator=self.request.user,
-                evaluated=evaluated_user,
-                meeting=meeting
+        if request.user.id == member_id:
+            return Response({'status': '본인을 평가할 수 없습니다.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 해당 멤버와 모임에 대한 평가가 이미 있는지 확인
+        evaluation_exists = UserEvaluation.objects.filter(
+            evaluator=request.user, 
+            evaluated=member, 
+            meeting=meeting
+        ).exists()
+
+        if not evaluation_exists and not meeting.can_evaluate:
+            member.activity_point += 3
+            member.save()
+            meeting.can_evaluate = True
+            meeting.save()
+
+            UserEvaluation.objects.create(
+                evaluator=request.user,
+                evaluated=member,
+                meeting=meeting,
+                is_positive=True  # 이 경우 평가가 항상 긍정적이라고 가정
             )
-        else:
-            raise serializer.ValidationError("잘못된 요청입니다.")
+            return Response({'status': 'success'}, status=status.HTTP_200_OK)
+
+        return Response({'status': '이미 평가되었거나 허용되지 않음'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class JoinMeetingRoom(APIView):
