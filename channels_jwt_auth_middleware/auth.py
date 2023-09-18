@@ -22,7 +22,7 @@ class JWTAuthMiddleware:
         close_old_connections()
         try:
             # 브라우저 환경
-            if(jwt_token_list := parse_qs(scope["query_string"].decode("utf8")).get('token', None)):
+            if (jwt_token_list := parse_qs(scope["query_string"].decode("utf8")).get('token', None)):
                 jwt_token = jwt_token_list[0]
                 jwt_payload = self.get_payload(jwt_token)
                 user_credentials = self.get_user_credentials(jwt_payload)
