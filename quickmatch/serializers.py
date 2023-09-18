@@ -62,6 +62,8 @@ class MeetingChangeSerializer(serializers.ModelSerializer):
 
 
 class MeetingMessageSerializer(serializers.ModelSerializer):
+    user = serializers.ReadOnlyField(source='user.email')
+    
     class Meta():
         model = MeetingMessage
         fields = '__all__'
