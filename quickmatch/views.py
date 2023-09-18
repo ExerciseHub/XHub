@@ -16,9 +16,7 @@ from .models import (
 )
 from .serializers import (
     MeetingSerializer,
-    MeetingChangeSerializer,
     MeetingDetailSerializer,
-    UserEvaluationSerializer,
 )
 
 User = get_user_model()
@@ -211,7 +209,6 @@ class MeetingDetailView(RetrieveAPIView):
     lookup_url_kwarg = 'quickmatchId'
 
 
-
 class EvaluateMemberView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -227,8 +224,8 @@ class EvaluateMemberView(APIView):
 
         # 해당 멤버와 모임에 대한 평가가 이미 있는지 확인
         evaluation_exists = UserEvaluation.objects.filter(
-            evaluator=request.user, 
-            evaluated=member, 
+            evaluator=request.user,
+            evaluated=member,
             meeting=meeting
         ).exists()
 
