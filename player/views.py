@@ -271,5 +271,4 @@ class CheckLoginUserEmail(APIView):
     
     def get(self, request):
         user = request.user
-        return Response({"email": user.email, "id": user.pk }, status=status.HTTP_200_OK)
-    
+        return Response({"email": user.email, "id": user.pk}, status=status.HTTP_200_OK)
