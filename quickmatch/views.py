@@ -17,6 +17,7 @@ from .models import (
 from .serializers import (
     MeetingSerializer,
     MeetingDetailSerializer,
+    MeetingChangeContentSerializer,
 )
 
 User = get_user_model()
@@ -139,6 +140,33 @@ class LeaveMeeting(APIView):
                 member.delete()
             
                 return Response({"message": "you leave this match!"})
+
+
+class ChangMeetingContents(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, quickmatchId):
+        return Response({"message": "GET method is not available."})
+    
+    def post(self, request, quickmatchId):
+        
+        quickmatch = get_object_or_404(Meeting, pk=quickmatchId)
+        
+        if quickmatch.organizer == request.user:
+            data = request.data.dict()  # Querydict(수정불가)를 dict로 바꿔줌.
+            if not data.get('title', None):
+                data.update({'title': quickmatch.title})
+                print(data.get('title', 'nono'))
+                
+            serializer = MeetingChangeContentSerializer(data=data)
+
+            if serializer.is_valid():
+                data = serializer.data
+                serializer.update(quickmatch, data)
+                return Response({"message": "QuickMatch config are Changed."})
+        
+        else:
+            return Response({"message": "적절하지 않은 요청입니다."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ChangeMeetingStatus(APIView):
