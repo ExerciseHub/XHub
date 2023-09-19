@@ -196,7 +196,7 @@ class MeetingSearchView(ListAPIView):
 
 
 class MeetingListView(ListCreateAPIView):
-    queryset = Meeting.objects.all()
+    queryset = Meeting.objects.all().order_by('-created_at')
     serializer_class = MeetingSerializer
     permission_classes = [AllowAny,]
 
@@ -218,11 +218,10 @@ class EvaluateMemberView(APIView):
 
         if not meeting.meeting_member.filter(id=request.user.id).exists():
             return Response({'status': '멤버만 평가할 수 있습니다.'}, status=status.HTTP_403_FORBIDDEN)
-        
-        if request.user.id == member_id:
+        elif request.user.id == member_id:
             return Response({'status': '본인을 평가할 수 없습니다.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # 해당 멤버와 모임에 대한 평가가 이미 있는지 확인
+        # 해당 멤버에 대한 평가가 이미 있는지 확인
         evaluation_exists = UserEvaluation.objects.filter(
             evaluator=request.user,
             evaluated=member,
@@ -232,14 +231,12 @@ class EvaluateMemberView(APIView):
         if not evaluation_exists and meeting.can_evaluate:
             member.activity_point += 3
             member.save()
-            meeting.can_evaluate = False
-            meeting.save()
 
             UserEvaluation.objects.create(
                 evaluator=request.user,
                 evaluated=member,
                 meeting=meeting,
-                is_positive=True  # 이 경우 평가가 항상 긍정적이라고 가정
+                can_evaluate=True  # 특정 유저 평가 여부
             )
             return Response({'status': 'success'}, status=status.HTTP_200_OK)
 
