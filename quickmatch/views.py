@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView, ListCreateAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView, ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
@@ -16,9 +16,7 @@ from .models import (
 )
 from .serializers import (
     MeetingSerializer,
-    MeetingChangeSerializer,
     MeetingDetailSerializer,
-    UserEvaluationSerializer,
 )
 
 User = get_user_model()
@@ -154,20 +152,16 @@ class ChangeMeetingStatus(APIView):
         quickmatch = get_object_or_404(Meeting, pk=quickmatchId)
         
         if quickmatch.organizer == request.user:
-            data = request.data.dict()  # Querydict(수정불가)를 dict로 바꿔줌.
-            if not data.get('title', None):
-                data.update({'title': quickmatch.title})
-                print(data.get('title', 'nono'))
-                
-            serializer = MeetingChangeSerializer(data=data)
+            newStatus = request.data.get('status')
+            if newStatus and newStatus in dict(Meeting.STATUS_CHOICE):
+                quickmatch.status = newStatus
+                quickmatch.save()
+                return Response({"message": f"회의 상태가 {newStatus}로 변경되었습니다."})
 
-            if serializer.is_valid():
-                data = serializer.data
-                serializer.update(quickmatch, data)
-                return Response({"message": "QuickMatch config are Changed."})
-        
+            else:
+                return Response({"message": "제공된 상태가 유효하지 않습니다."}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response({"message": "적절하지 않은 요청입니다."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "부적절한 요청입니다."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class MeetingSearchView(ListAPIView):
@@ -215,7 +209,6 @@ class MeetingDetailView(RetrieveAPIView):
     lookup_url_kwarg = 'quickmatchId'
 
 
-
 class EvaluateMemberView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -231,15 +224,15 @@ class EvaluateMemberView(APIView):
 
         # 해당 멤버와 모임에 대한 평가가 이미 있는지 확인
         evaluation_exists = UserEvaluation.objects.filter(
-            evaluator=request.user, 
-            evaluated=member, 
+            evaluator=request.user,
+            evaluated=member,
             meeting=meeting
         ).exists()
 
-        if not evaluation_exists and not meeting.can_evaluate:
+        if not evaluation_exists and meeting.can_evaluate:
             member.activity_point += 3
             member.save()
-            meeting.can_evaluate = True
+            meeting.can_evaluate = False
             meeting.save()
 
             UserEvaluation.objects.create(
