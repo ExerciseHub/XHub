@@ -47,5 +47,8 @@ USER django-user
 EXPOSE 8000
 
 # Django 서버를 시작하는 명령을 실행합니다.
-CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000", "--timeout", "120"]
+# CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000", "--timeout", "120"]
+# Daphne 실행을 위해서 추가:
+ARG SERVICE_TYPE=django
+CMD ["sh", "-c", "if [ \"$SERVICE_TYPE\" = \"daphne\" ]; then daphne -u /tmp/daphne.sock core.asgi:application; else gunicorn core.wsgi:application --bind 0.0.0.0:8000 --timeout 120; fi"]
 
