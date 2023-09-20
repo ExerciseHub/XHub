@@ -2,6 +2,7 @@ version: '3'  # Docker Compose의 버전을 지정합니다.
 
 services:  # 서비스 목록을 정의합니다.
   django:  # Django 애플리케이션 서비스를 정의합니다.
+    user: django-user
     build:  # 이미지 빌드 정보를 지정합니다.
       context: .  # 빌드 컨텍스트로 현재 디렉토리를 사용합니다.
       dockerfile: Dockerfile  # 사용할 Dockerfile을 지정합니다.
@@ -56,15 +57,16 @@ services:  # 서비스 목록을 정의합니다.
       - redis
     volumes:
       - .:/app
-      - ./staticfiles:/staticfiles
+      - ./staticfiles:/app/staticfiles
       - daphne-socket:/tmp
     hostname: daphne
     # command: ["daphne", "-b", "0.0.0.0", "-p", "8001", "core.asgi:application"]
     command: ["daphne", "-u", "/tmp/daphne.sock", "core.asgi:application"]
 
-
   nginx:
-    image: nginx:1.25.2 # 최신 버전의 nginx 이미지를 사용합니다.
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx  # custom Dockerfile for nginx
     ports:
       - "80:80" # 호스트의 80 포트와 컨테이너의 80 포트를 맵핑합니다.
     volumes:
