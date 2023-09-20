@@ -12,6 +12,7 @@ from .views import (
     MeetingListView,
     IsMemberView,
     EvaluateMemberView,
+    ChangMeetingContents,
 )
 
 app_name = 'quickmatch'
@@ -31,6 +32,9 @@ urlpatterns = [
 
     # 모임 상태 변경
     path('<int:quickmatchId>/status/', ChangeMeetingStatus.as_view(), name='status'),
+    
+    # 모임 내용 수정
+    path('<int:quickmatchId>/contents/', ChangMeetingContents.as_view(), name='status'),
 
     # 모임 전체 목록 보기
     path('list/', MeetingListView.as_view(), name='list'),
