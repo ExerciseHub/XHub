@@ -93,7 +93,7 @@ class UserEvaluation(models.Model):
     evaluator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="given_evaluations")
     evaluated = models.ForeignKey(User, on_delete=models.CASCADE, related_name="received_evaluations")
     meeting = models.ForeignKey(Meeting, on_delete=models.CASCADE)
-    is_positive = models.BooleanField()  # Y면 True, N이면 False
+    can_evaluate = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
