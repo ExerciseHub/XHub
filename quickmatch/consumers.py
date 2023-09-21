@@ -1,7 +1,6 @@
 import json
 import logging
 import asyncio
-from collections import OrderedDict
 
 from django.contrib.auth import get_user_model
 from channels.generic.websocket import AsyncWebsocketConsumer
