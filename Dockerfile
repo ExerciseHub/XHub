@@ -37,6 +37,9 @@ RUN adduser \
     --no-create-home \
     django-user
 
+# staticfiles 디렉토리 생성 및 권한 설정
+RUN mkdir -p /app/staticfiles && chown -R django-user:django-user /app/staticfiles
+
 # 비권한 사용자로 전환
 USER django-user
 
@@ -44,4 +47,8 @@ USER django-user
 EXPOSE 8000
 
 # Django 서버를 시작하는 명령을 실행합니다.
-CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000"]
+# CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000", "--timeout", "120"]
+# Daphne 실행을 위해서 추가:
+ARG SERVICE_TYPE=django
+CMD ["sh", "-c", "if [ \"$SERVICE_TYPE\" = \"daphne\" ]; then daphne -u /tmp/daphne.sock core.asgi:application; else gunicorn core.wsgi:application --bind 0.0.0.0:8000 --timeout 120; fi"]
+

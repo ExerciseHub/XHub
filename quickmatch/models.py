@@ -26,7 +26,7 @@ class Meeting(models.Model):
 
     location = models.CharField(max_length=255)  # 고민
     # 참여자
-    meeting_member = models.ManyToManyField(User, through='MeetingMembers', related_name='quickmatches', blank=True)  # 고민
+    meeting_member = models.ManyToManyField(User, through='MeetingMembers', related_name='quickmatches', blank=True)
 
     max_participants = models.PositiveIntegerField()
     current_participants = models.PositiveIntegerField(validators=[MinValueValidator(1)], default=1)
@@ -54,7 +54,7 @@ class Meeting(models.Model):
             orig = Meeting.objects.get(pk=self.pk)
             if orig.status != self.status and self.status == "모집완료":
                 # 30분 뒤에 enable_user_evaluation 태스크를 스케줄링
-                enable_user_evaluation.apply_async(args=[self.pk], countdown=5 * 60)  # 5분 * 60초
+                enable_user_evaluation.apply_async(args=[self.pk], countdown=1 * 60)  # 5분 * 60초
         super(Meeting, self).save(*args, **kwargs)
 
 
@@ -93,8 +93,15 @@ class UserEvaluation(models.Model):
     evaluator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="given_evaluations")
     evaluated = models.ForeignKey(User, on_delete=models.CASCADE, related_name="received_evaluations")
     meeting = models.ForeignKey(Meeting, on_delete=models.CASCADE)
-    is_positive = models.BooleanField()  # Y면 True, N이면 False
+    can_evaluate = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ("evaluator", "evaluated", "meeting")
+
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    message = models.TextField()
+    read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
