@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView, RetrieveAPIView, ListCreateAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
@@ -18,6 +18,7 @@ from .serializers import (
     MeetingSerializer,
     MeetingDetailSerializer,
     MeetingChangeContentSerializer,
+    NotificationSerializer,
 )
 
 User = get_user_model()
@@ -321,3 +322,24 @@ class IsMemberView(APIView):
         is_member = meeting.meeting_member.filter(id=user.id).exists()
 
         return Response({'is_member': is_member})
+
+# 사용자의 모든 알림 목록을 반환하거나 새로운 알림 생성
+class NotificationListCreateView(ListCreateAPIView):
+    serializer_class = NotificationSerializer
+
+    def get_queryset(self):
+        return self.request.user.notifications.filter(read=False)
+
+# 특정 알림의 상세 정보를 가져오거나 수정 및 삭제
+class NotificationRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
+    serializer_class = NotificationSerializer
+
+    def get_queryset(self):
+        return self.request.user.notifications.all()
+    
+    # 해당 알림을 읽었다는 표시
+    def put(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.read = True
+        instance.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
