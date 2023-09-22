@@ -24,6 +24,7 @@ jobs:
             git checkout main
             git pull origin main
             docker-compose --env-file /home/ubuntu/XHub/.env down
+            docker-compose --env-file /home/ubuntu/XHub/.env pull
             docker-compose --env-file /home/ubuntu/XHub/.env build
             docker-compose --env-file /home/ubuntu/XHub/.env up -d
           EOF
