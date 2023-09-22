@@ -14,14 +14,14 @@ jobs:
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.5.3
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh-private-key: ${{ secrets.SSH_PUBLIC_KEY }}
 
       - name: SSH and Update
         run: |
           echo "54.248.217.183 $(ssh-keyscan -H 54.248.217.183)" >> ~/.ssh/known_hosts
           
           # SSH into the server
-          ssh ubuntu@54.248.217.183 <<EOF
+          ssh -v ubuntu@54.248.217.183 <<EOF
             # Navigate to the Lighthouse directory
             cd /home/ubuntu/XHub
             # Pull the latest version of the repository
