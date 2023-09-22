@@ -14,7 +14,7 @@ jobs:
         uses: foo-software/lighthouse-check-action@v10.0.0
         with:
           outputDirectory: /tmp/artifacts
-          urls: 'http://54.248.217.183'
+          urls: '54.248.217.183'
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
