@@ -19,14 +19,10 @@ jobs:
       - name: SSH and Update
         run: |
           echo "54.248.217.183 $(ssh-keyscan -H 54.248.217.183)" >> ~/.ssh/known_hosts
-          
-          # SSH into the server
           ssh -v ubuntu@54.248.217.183 <<EOF
-            # Navigate to the Lighthouse directory
             cd /home/ubuntu/XHub
-            # Pull the latest version of the repository
+            git checkout main
             git pull origin develop
-            # Rebuild and restart the Docker services
             docker-compose --env-file /home/ubuntu/XHub/.env down
             docker-compose --env-file /home/ubuntu/XHub/.env build
             docker-compose --env-file /home/ubuntu/XHub/.env up -d
