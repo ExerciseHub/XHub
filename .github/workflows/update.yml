@@ -2,7 +2,7 @@ name: Update Lighthouse
 on:
   push:
     branches:
-      - develop
+      - main
 
 jobs:
   update-lighthouse:
@@ -22,7 +22,7 @@ jobs:
           ssh -v ubuntu@54.248.217.183 <<EOF
             cd /home/ubuntu/XHub
             git checkout main
-            git pull origin develop
+            git pull origin main
             docker-compose --env-file /home/ubuntu/XHub/.env down
             docker-compose --env-file /home/ubuntu/XHub/.env build
             docker-compose --env-file /home/ubuntu/XHub/.env up -d
