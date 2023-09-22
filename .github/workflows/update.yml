@@ -8,6 +8,9 @@ jobs:
   update-lighthouse:
     runs-on: ubuntu-latest
     steps:
+      - name: Add user to docker group
+        run: sudo usermod -aG docker $USER && sudo service docker restart
+        
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.5.3
         with:
@@ -18,7 +21,7 @@ jobs:
           echo "54.248.217.183 $(ssh-keyscan -H 54.248.217.183)" >> ~/.ssh/known_hosts
           
           # SSH into the server
-          ssh ubuntu@54.248.217.183 <<EOF
+          ssh 763157973242@54.248.217.183 <<EOF
             # Navigate to the Lighthouse directory
             cd /home/ubuntu/XHub
             # Pull the latest version of the repository
