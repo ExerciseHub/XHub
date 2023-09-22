@@ -12,7 +12,7 @@ jobs:
         run: sudo usermod -aG docker $USER && sudo service docker restart
         
       - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.5.3
+        uses: webfactory/ssh-agent@v0.6.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
