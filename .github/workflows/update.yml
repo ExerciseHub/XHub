@@ -18,7 +18,7 @@ jobs:
 
       - name: SSH and Update
         run: |
-          echo "54.248.217.183 $(ssh-keyscan -H 54.248.217.183)" >> ~/.ssh/known_hosts
+          ssh-keyscan 54.248.217.183 >> ~/.ssh/known_hosts
           ssh -v ubuntu@54.248.217.183 <<EOF
             cd /home/ubuntu/XHub
             git checkout main
