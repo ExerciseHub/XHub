@@ -21,7 +21,7 @@ jobs:
           echo "54.248.217.183 $(ssh-keyscan -H 54.248.217.183)" >> ~/.ssh/known_hosts
           
           # SSH into the server
-          ssh ayinsama@54.248.217.183 <<EOF
+          ssh Ubuntu@54.248.217.183 <<EOF
             # Navigate to the Lighthouse directory
             cd /home/ubuntu/XHub
             # Pull the latest version of the repository
