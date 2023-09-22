@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
+from .views import home
 
 # swagger
 from rest_framework import permissions
@@ -25,6 +26,7 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
+    path('', home, name='home'),
     path('admin/', admin.site.urls),
     
     # swagger
@@ -32,6 +34,7 @@ urlpatterns = [
     path('player/', include('player.urls')),
     path('quickmatch/', include('quickmatch.urls')),
     path('board/', include('board.urls')),
+    path('', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 ]
 
 # img

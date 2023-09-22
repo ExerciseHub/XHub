@@ -1,0 +1,27 @@
+name: XHub CI/CD Github Actions for Lighthouse
+on: 
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lighthouse-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: mkdir /tmp/artifacts
+      - name: Run Lighthouse
+        uses: foo-software/lighthouse-check-action@v10.0.0
+        with:
+          outputDirectory: /tmp/artifacts
+          urls: 'http://54.248.217.183'
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: Lighthouse reports
+          path: /tmp/artifacts
+      - name: merge process
+        uses: "pascalgn/automerge-action@v0.15.6"
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+

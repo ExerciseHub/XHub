@@ -1,4 +1,5 @@
 import traceback
+from urllib.parse import parse_qs
 
 from channels.auth import AuthMiddlewareStack
 from channels.db import database_sync_to_async
@@ -19,11 +20,14 @@ class JWTAuthMiddleware:
 
     async def __call__(self, scope, receive, send):
         close_old_connections()
+        if counter := parse_qs(scope["query_string"].decode("utf8")).get('rcc', None):
+            scope['rcc'] = counter[0]
+        else:
+            scope['rcc'] = '0'
         try:
-            if jwt_token_list := scope.get("headers", []):
-                for key, value in jwt_token_list:
-                    if key == b'authorization':
-                        jwt_token = value.decode('utf-8').split(' ')[1]
+            # 브라우저 환경
+            if (jwt_token_list := parse_qs(scope["query_string"].decode("utf8")).get('token', None)):
+                jwt_token = jwt_token_list[0]
                 jwt_payload = self.get_payload(jwt_token)
                 user_credentials = self.get_user_credentials(jwt_payload)
                 user = await self.get_logged_in_user(user_credentials)

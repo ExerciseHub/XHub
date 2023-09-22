@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView, ListCreateAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
@@ -16,9 +16,9 @@ from .models import (
 )
 from .serializers import (
     MeetingSerializer,
-    MeetingChangeSerializer,
     MeetingDetailSerializer,
-    UserEvaluationSerializer,
+    MeetingChangeContentSerializer,
+    NotificationSerializer,
 )
 
 User = get_user_model()
@@ -143,7 +143,7 @@ class LeaveMeeting(APIView):
                 return Response({"message": "you leave this match!"})
 
 
-class ChangeMeetingStatus(APIView):
+class ChangMeetingContents(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, quickmatchId):
@@ -159,7 +159,7 @@ class ChangeMeetingStatus(APIView):
                 data.update({'title': quickmatch.title})
                 print(data.get('title', 'nono'))
                 
-            serializer = MeetingChangeSerializer(data=data)
+            serializer = MeetingChangeContentSerializer(data=data)
 
             if serializer.is_valid():
                 data = serializer.data
@@ -168,6 +168,29 @@ class ChangeMeetingStatus(APIView):
         
         else:
             return Response({"message": "적절하지 않은 요청입니다."}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ChangeMeetingStatus(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, quickmatchId):
+        return Response({"message": "GET method is not available."})
+    
+    def post(self, request, quickmatchId):
+        
+        quickmatch = get_object_or_404(Meeting, pk=quickmatchId)
+        
+        if quickmatch.organizer == request.user:
+            newStatus = request.data.get('status')
+            if newStatus and newStatus in dict(Meeting.STATUS_CHOICE):
+                quickmatch.status = newStatus
+                quickmatch.save()
+                return Response({"message": f"회의 상태가 {newStatus}로 변경되었습니다."})
+
+            else:
+                return Response({"message": "제공된 상태가 유효하지 않습니다."}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({"message": "부적절한 요청입니다."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class MeetingSearchView(ListAPIView):
@@ -202,7 +225,7 @@ class MeetingSearchView(ListAPIView):
 
 
 class MeetingListView(ListCreateAPIView):
-    queryset = Meeting.objects.all()
+    queryset = Meeting.objects.all().order_by('-created_at')
     serializer_class = MeetingSerializer
     permission_classes = [AllowAny,]
 
@@ -215,24 +238,38 @@ class MeetingDetailView(RetrieveAPIView):
     lookup_url_kwarg = 'quickmatchId'
 
 
-class EvaluateUserView(CreateAPIView):
-    queryset = UserEvaluation.objects.all()
-    serializer_class = UserEvaluationSerializer
+class EvaluateMemberView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        meeting = get_object_or_404(Meeting, pk=self.kwargs['meeting_id'])
-        evaluated_user = get_object_or_404(User, pk=self.kwargs['user_id'])
-        
-        # 평가자와 평가 대상이 동일한 모임에 참가했는지 확인
-        if self.request.user in meeting.meeting_member.all() and evaluated_user in meeting.meeting_member.all():
-            serializer.save(
-                evaluator=self.request.user,
-                evaluated=evaluated_user,
-                meeting=meeting
+    def post(self, request, member_id, meeting_id):
+        member = get_object_or_404(User, id=member_id)
+        meeting = get_object_or_404(Meeting, id=meeting_id)
+
+        if not meeting.meeting_member.filter(id=request.user.id).exists():
+            return Response({'status': '멤버만 평가할 수 있습니다.'}, status=status.HTTP_403_FORBIDDEN)
+        elif request.user.id == member_id:
+            return Response({'status': '본인을 평가할 수 없습니다.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 해당 멤버에 대한 평가가 이미 있는지 확인
+        evaluation_exists = UserEvaluation.objects.filter(
+            evaluator=request.user,
+            evaluated=member,
+            meeting=meeting
+        ).exists()
+
+        if not evaluation_exists and meeting.can_evaluate:
+            member.activity_point += 3
+            member.save()
+
+            UserEvaluation.objects.create(
+                evaluator=request.user,
+                evaluated=member,
+                meeting=meeting,
+                can_evaluate=True  # 특정 유저 평가 여부
             )
-        else:
-            raise serializer.ValidationError("잘못된 요청입니다.")
+            return Response({'status': 'success'}, status=status.HTTP_200_OK)
+
+        return Response({'status': '이미 평가되었거나 허용되지 않음'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class JoinMeetingRoom(APIView):
@@ -285,3 +322,24 @@ class IsMemberView(APIView):
         is_member = meeting.meeting_member.filter(id=user.id).exists()
 
         return Response({'is_member': is_member})
+
+# 사용자의 모든 알림 목록을 반환하거나 새로운 알림 생성
+class NotificationListCreateView(ListCreateAPIView):
+    serializer_class = NotificationSerializer
+
+    def get_queryset(self):
+        return self.request.user.notifications.filter(read=False)
+
+# 특정 알림의 상세 정보를 가져오거나 수정 및 삭제
+class NotificationRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
+    serializer_class = NotificationSerializer
+
+    def get_queryset(self):
+        return self.request.user.notifications.all()
+    
+    # 해당 알림을 읽었다는 표시
+    def put(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.read = True
+        instance.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
