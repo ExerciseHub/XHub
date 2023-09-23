@@ -1,3 +1,4 @@
+# pull request 들어오는 즉시 머지 (xHub 전용)
 name: Auto Merge Pull Request (Yesman)
 
 on:
