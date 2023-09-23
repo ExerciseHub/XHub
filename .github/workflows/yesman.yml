@@ -1,0 +1,28 @@
+name: Auto Merge Pull Request (Yesman)
+
+on:
+  pull_request:
+    types:
+      - opened
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      
+      - name: Merge PR
+        run: |
+          # Check if the PR is targeting the main branch
+          if [[ ${{ github.event.pull_request.base.ref }} == "main" ]]; then
+            # Merge the PR without further checks
+            git config user.name "GitHub Actions"
+            git config user.email "actions@github.com"
+            git fetch origin "+refs/pull/${{ github.event.pull_request.number }}/merge:"
+            git merge FETCH_HEAD --no-edit
+            git checkout main
+            git push origin main
+          else
+            echo "Skipping merge because the PR is not targeting 'main' branch."
+          fi
