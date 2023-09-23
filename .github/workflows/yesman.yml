@@ -22,7 +22,7 @@ jobs:
             # Merge the PR without further checks
             git config user.name "GitHub Actions"
             git config user.email "actions@github.com"
-            git fetch origin "+refs/pull/${{ github.event.pull_request.number }}/merge:"
+            git fetch origin main:"+refs/heads/main" "+refs/pull/${{ github.event.pull_request.number }}/merge:"
             git merge FETCH_HEAD --no-edit
             git push origin main
           else
