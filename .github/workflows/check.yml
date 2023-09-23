@@ -14,7 +14,7 @@ jobs:
       
       - name: Merge PR
         run: |
-          # Check if the PR is targeting the main branch
+          # main 브렌치 가리키는지 확인
           if [[ ${{ github.event.pull_request.base.ref }} == "main" ]]; then
             # Check if the PR is approved
             APPROVALS=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
