@@ -1,10 +1,14 @@
+import json
+import redis
+
 from django.http import Http404
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.hashers import check_password
+
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status, filters
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from django.contrib.auth.hashers import check_password
 from rest_framework.response import Response
 from rest_framework.generics import (
     CreateAPIView,
@@ -13,6 +17,7 @@ from rest_framework.generics import (
     ListAPIView,
     UpdateAPIView,
 )
+
 from .models import (
     User,
     DMRoom,
@@ -26,8 +31,7 @@ from .serializers import (
     RoomSerializer,
     PasswordChangeSerializer,
 )
-import json
-import redis
+
 
 r = redis.StrictRedis(host='redis', port=6379, db=0)
 
