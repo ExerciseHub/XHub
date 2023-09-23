@@ -1,4 +1,5 @@
 from django.urls import path
+from rest_framework_simplejwt.views import TokenRefreshView, TokenBlacklistView
 from .views import (
     RegisterView,
     Login,
@@ -23,7 +24,13 @@ urlpatterns = [
 
     # 로그인
     path("login/", Login.as_view(), name="login"),
-
+    
+    # 토큰 refresh
+    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    
+    # 토큰 blakclist
+    path("token/blacklist/", TokenBlacklistView.as_view(), name="token_blacklist"),
+    
     # 로그아웃
     path('logout/', Logout.as_view(), name='logout'),
 
