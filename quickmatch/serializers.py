@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from .models import Meeting, MeetingMessage, MeetingRoom, UserEvaluation
+from .models import Meeting, MeetingMessage, MeetingRoom, UserEvaluation, Notification
 
 User = get_user_model()
 
@@ -82,3 +82,9 @@ class UserEvaluationSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserEvaluation
         fields = ['evaluator', 'evaluated', 'meeting', 'can_evaluate']
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = '__all__'
