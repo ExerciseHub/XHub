@@ -11,19 +11,22 @@ jobs:
       - name: Add user to docker group
         run: sudo usermod -aG docker $USER && sudo service docker restart
         
+        # SSH 연결
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.6.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+        # SSH 연결 후 명령어 실행
       - name: SSH and Update
         run: |
           ssh-keyscan 54.248.217.183 >> ~/.ssh/known_hosts
           ssh -v ubuntu@54.248.217.183 <<EOF
             cd /home/ubuntu/XHub
+            docker compose --env-file /home/ubuntu/XHub/.env down
+            docker compose --env-file /home/ubuntu/XHub/.env pull
+            docker compose --env-file /home/ubuntu/XHub/.env build
+            docker compose --env-file /home/ubuntu/XHub/.env up -d
             git checkout main
             git pull origin main
-            docker-compose --env-file /home/ubuntu/XHub/.env down
-            docker-compose --env-file /home/ubuntu/XHub/.env build
-            docker-compose --env-file /home/ubuntu/XHub/.env up -d
           EOF
