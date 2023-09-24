@@ -92,6 +92,7 @@ INSTALLED_APPS = [
     # 프레임워크 및 라이브러리?
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'drf_yasg', # swagger
     "celery",
     'corsheaders',
@@ -212,18 +213,23 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # JWT 토큰 만료 시간 설정
 
 SIMPLE_JWT = {
-    'ALGORITHM': 'HS256',
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    # 'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
-    'ROTATE_REFRESH_TOKENS': False,
+    'REFRESH_TOKEN_LIFETIME': timedelta(hours=1),
+    'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': False,
+    
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
     'VERIFYING_KEY': None,
     'VALIDATING_KEY': None,
-    'SIGNING_KEY': SECRET_KEY,
     'VERIFY_SIGNATURE': True,
+    
+    'AUTH_HEADER_TYPES': ("Bearer", "JWT"),
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
     'USER_ID_FIELD': 'id',
     'USER_ID_CLAIM': 'user_id',
     'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
+    
+    "TOKEN_BLACKLIST_SERIALIZER": "rest_framework_simplejwt.serializers.TokenBlacklistSerializer",
 }
