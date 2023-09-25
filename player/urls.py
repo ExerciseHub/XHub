@@ -1,4 +1,5 @@
 from django.urls import path
+from rest_framework_simplejwt.views import TokenRefreshView, TokenBlacklistView
 from .views import (
     RegisterView,
     Login,
@@ -12,33 +13,34 @@ from .views import (
     MessageListView,
     CreateRoomView,
     PasswordChangeView,
-    CheckLoginUserEmail
+    CheckLoginUserView,
 )
 
 app_name = "player"
 
 urlpatterns = [
     # 회원가입
-    # path("register/", RegisterView, name="register"),
     path("register/", RegisterView.as_view(), name="register"),
 
     # 로그인
-    # path('login/', Login, name='login'),
     path("login/", Login.as_view(), name="login"),
-
+    
+    # 토큰 refresh
+    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    
+    # 토큰 blakclist
+    path("token/blacklist/", TokenBlacklistView.as_view(), name="token_blacklist"),
+    
     # 로그아웃
-    # path('logout/', Logout, name='logout'),
     path('logout/', Logout.as_view(), name='logout'),
 
     # 회원 정보수정
-    # path('update/', Update, name='update'),
     path('update/', Update.as_view(), name='update'),
 
     # 비밀번호 수정
     path('update/ps/', PasswordChangeView.as_view(), name='pw_change'),
 
     # 회원 탈퇴
-    # path("<str:playerId>/", 기능, name="remove"),
     path("unregister/", UnregisterUserView.as_view(), name="unregister"),
 
     # 전체 회원 조회
@@ -60,5 +62,5 @@ urlpatterns = [
     path('chat-room/create/', CreateRoomView.as_view(), name='create_room'),
     
     # 로그인된 유저 확인
-    path('check/email/', CheckLoginUserEmail.as_view(), name='check_user'),
+    path('check/email/', CheckLoginUserView.as_view(), name='check_user'),
 ]

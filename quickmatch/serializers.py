@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from .models import Meeting, MeetingMessage, MeetingRoom, UserEvaluation
+from .models import Meeting, MeetingMessage, MeetingRoom, UserEvaluation, Notification
 
 User = get_user_model()
 
@@ -41,17 +41,16 @@ class MeetingDetailSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class MeetingChangeSerializer(serializers.ModelSerializer):
+class MeetingChangeContentSerializer(serializers.ModelSerializer):
     class Meta():
         model = Meeting
-        fields = ['title', 'description', 'status', 'age_limit', 'category', 'gender_limit', 'max_participants']
+        fields = ['title', 'description', 'age_limit', 'category', 'gender_limit', 'max_participants']
     
     def update(self, instance, validated_data):
         print(validated_data)
         
         instance.title = validated_data.get('title', instance.title)
         instance.description = validated_data.get('description', instance.description)
-        instance.status = validated_data.get('status', instance.status)
         instance.age_limit = validated_data.get('age_limit', instance.age_limit)
         instance.category = validated_data.get('category', instance.category)
         instance.gender_limit = validated_data.get('gender_limit', instance.gender_limit)
@@ -62,6 +61,8 @@ class MeetingChangeSerializer(serializers.ModelSerializer):
 
 
 class MeetingMessageSerializer(serializers.ModelSerializer):
+    user = serializers.ReadOnlyField(source='user.email')
+    
     class Meta():
         model = MeetingMessage
         fields = '__all__'
@@ -78,8 +79,12 @@ class MeetingRoomSerializer(serializers.ModelSerializer):
 
 
 class UserEvaluationSerializer(serializers.ModelSerializer):
-    evaluator = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    
     class Meta:
         model = UserEvaluation
-        fields = ['meeting', 'evaluator', 'evaluated', 'evaluation']
+        fields = ['evaluator', 'evaluated', 'meeting', 'can_evaluate']
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = '__all__'

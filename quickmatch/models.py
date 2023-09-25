@@ -26,7 +26,7 @@ class Meeting(models.Model):
 
     location = models.CharField(max_length=255)  # 고민
     # 참여자
-    meeting_member = models.ManyToManyField(User, through='MeetingMembers', related_name='quickmatches', blank=True)  # 고민
+    meeting_member = models.ManyToManyField(User, through='MeetingMembers', related_name='quickmatches', blank=True)
 
     max_participants = models.PositiveIntegerField()
     current_participants = models.PositiveIntegerField(validators=[MinValueValidator(1)], default=1)
@@ -93,8 +93,15 @@ class UserEvaluation(models.Model):
     evaluator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="given_evaluations")
     evaluated = models.ForeignKey(User, on_delete=models.CASCADE, related_name="received_evaluations")
     meeting = models.ForeignKey(Meeting, on_delete=models.CASCADE)
-    is_positive = models.BooleanField()  # Y면 True, N이면 False
+    can_evaluate = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ("evaluator", "evaluated", "meeting")
+
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    message = models.TextField()
+    read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)

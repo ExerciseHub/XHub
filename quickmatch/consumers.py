@@ -1,22 +1,27 @@
 import json
+import logging
+import asyncio
 
 from django.contrib.auth import get_user_model
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 
 from .models import MeetingMembers, MeetingMessage, MeetingRoom
-
+from .serializers import MeetingMessageSerializer
 
 User = get_user_model()
-
+logger = logging.getLogger(__name__)
 
 class MeetingRoomConsumer(AsyncWebsocketConsumer):
     
     async def connect(self):
+        logger.info(f"WebSocket connection established for {self.scope['user']}")
         self.room_name = self.scope['url_route']['kwargs']['quickmatchId']
         self.room_group_name = 'quickmatch_%s_chat' % self.room_name
         # 미들웨어 이용한 user
         self.user = self.scope['user']
+        self.rcc = self.scope['rcc']
+        logger.info(f"WebSocket Reconnection Counter : {self.rcc}")
         
         await self.channel_layer.group_add(
             self.room_group_name,
@@ -24,27 +29,36 @@ class MeetingRoomConsumer(AsyncWebsocketConsumer):
         )
         await self.accept()
         
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'room_info_message',
-                'message' : f'{self.user} joined the chat.'
-            }
-        )
+        if self.rcc == '0':
+            await self.change_recent_conversations(self.room_name)
+            
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'room_info_message',
+                    'message' : f'{self.user} joined the chat.'
+                }
+            )
 
     async def disconnect(self, close_code):
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'room_info_message',
-                'message' : f'{self.user} has left the chat.'
-            }
-        )
+        logger.warning(f"WebSocket connection closed for {self.scope['user']}. Close code: {close_code}")
         
-        await self.channel_layer.group_discard(
-            self.room_group_name,
-            self.channel_name
-        )
+        if close_code == 1006:
+            await asyncio.sleep(2)  # 5초 대기
+            await self.accept()  # 다시 연결 수락
+        else:
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'room_info_message',
+                    'message' : f'{self.user} has left the chat.'
+                }
+            )
+            
+            await self.channel_layer.group_discard(
+                self.room_group_name,
+                self.channel_name
+            )
 
     # Receive message from WebSocket
     async def receive(self, text_data):
@@ -99,6 +113,10 @@ class MeetingRoomConsumer(AsyncWebsocketConsumer):
             'sender_email': 'system'
         }))
     
+    async def change_recent_conversations(self, room_id):
+        str_data = await self.load_recent_conversations(room_id)
+        await self.send(text_data=str_data)
+    
     @database_sync_to_async
     def get_members_email(self):
         members = MeetingMembers.objects.filter(quickmatch=self.room_name)
@@ -112,9 +130,12 @@ class MeetingRoomConsumer(AsyncWebsocketConsumer):
         
         MeetingMessage.objects.create(room=meetingroom, user=user, content=message)
     
-    # @database_sync_to_async
-    # def load_recent_conversation(self):
-    #     conversations = MeetingMessage.objects.all().order_by('-created_at')
-    #     pass
-    
+    @database_sync_to_async
+    def load_recent_conversations(self, room_id):
+        conversations = MeetingMessage.objects.filter(room=room_id).order_by('created_at')
+        serializer = MeetingMessageSerializer(conversations, many=True)
+        data = serializer.data
+        
+        str_data = json.dumps(data, ensure_ascii=False)
+        return str_data
     

@@ -50,6 +50,24 @@ CHANNEL_LAYERS = {
     },
 }
 
+# 로깅세팅
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'websocket': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django.channels': {
+            'handlers': ['websocket'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}
 
 # Celery configurations
 CELERY_BROKER_URL = 'redis://redis:6379/0'
@@ -74,6 +92,7 @@ INSTALLED_APPS = [
     # 프레임워크 및 라이브러리?
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'drf_yasg', # swagger
     "celery",
     'corsheaders',
@@ -183,7 +202,7 @@ USE_TZ = False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -194,17 +213,23 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # JWT 토큰 만료 시간 설정
 
 SIMPLE_JWT = {
-    'ALGORITHM': 'HS256',
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
-    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
-    'ROTATE_REFRESH_TOKENS': False,
+    'REFRESH_TOKEN_LIFETIME': timedelta(hours=1),
+    'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': False,
+    
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
     'VERIFYING_KEY': None,
     'VALIDATING_KEY': None,
-    'SIGNING_KEY': SECRET_KEY,
     'VERIFY_SIGNATURE': True,
+    
+    'AUTH_HEADER_TYPES': ("Bearer", "JWT"),
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
     'USER_ID_FIELD': 'id',
     'USER_ID_CLAIM': 'user_id',
     'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
+    
+    "TOKEN_BLACKLIST_SERIALIZER": "rest_framework_simplejwt.serializers.TokenBlacklistSerializer",
 }
