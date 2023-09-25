@@ -6,9 +6,9 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 ENV PATH="/py/bin:$PATH"
 
-# Python 및 PostgreSQL에 필요한 시스템 패키지를 설치합니다.
+# Python 및 PostgreSQL에 필요한 시스템 패키지를 설치합니다.  # 여기에 libffi-dev 추가
 RUN apk update \
-    && apk add --no-cache postgresql-dev gcc musl-dev jpeg-dev zlib-dev \
+    && apk add --no-cache postgresql-dev gcc musl-dev jpeg-dev zlib-dev libffi-dev \
     && python3 -m ensurepip \
     && pip3 install --no-cache --upgrade pip setuptools
 
@@ -25,8 +25,8 @@ RUN python -m venv /py
 RUN /py/bin/pip install --upgrade pip \
     && /py/bin/pip install -r requirements.txt
 
-# 빌드에만 필요한 패키지를 제거합니다.
-RUN apk del gcc musl-dev
+# 빌드에만 필요한 패키지를 제거합니다.  # 여기에 libffi-dev 추가
+RUN apk del gcc musl-dev libffi-dev
 
 # 디렉터리가 존재하는 경우에만 chmod 명령을 실행합니다.
 RUN if [ -d "/app/staticfiles" ]; then chmod -R 755 /app/staticfiles; fi
