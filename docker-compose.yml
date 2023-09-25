@@ -74,9 +74,11 @@ services:  # 서비스 목록을 정의합니다.
       dockerfile: Dockerfile.nginx  # custom Dockerfile for nginx
     ports:
       - "80:80" # 호스트의 80 포트와 컨테이너의 80 포트를 맵핑합니다.
+      - "443:443" 
     volumes:
       # 호스트의 ./nginx/nginx.conf 파일을 컨테이너의 /etc/nginx/nginx.conf 위치에 읽기 전용으로 마운트합니다.
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - /etc/letsencrypt:/etc/letsencrypt
       # 본 nginx 의 정적 파일 경로를 설정합니다.
       - ./staticfiles:/staticfiles
       - daphne-socket:/tmp
