@@ -92,6 +92,7 @@
     - MeetingMember (1회성 모임 멤버)
     - MeetingChat (1회성 모임 채팅)
     - UserEvaluation (유저 평가)
+    - Notification (유저 평가 알람)
 - board
     - Post (게시판)
     - Comment (댓글)
