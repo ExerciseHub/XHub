@@ -16,7 +16,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         user_id_1 = self.scope['url_route']['kwargs']['user_id_1']
         user_id_2 = self.scope['url_route']['kwargs']['user_id_2']
 
-        # Ensure user_id_1 is always less than user_id_2 to create a unique name
         self.name = f"chat_{min(user_id_1, user_id_2)}_{max(user_id_1, user_id_2)}"
 
         await self.channel_layer.group_add(

@@ -272,7 +272,7 @@ class CreateRoomView(CreateAPIView):
 
 class CheckLoginUserView(APIView):
     permission_classes = [IsAuthenticated]
-    
+
     def get(self, request):
         user = request.user
         return Response({"email": user.email, "id": user.pk}, status=status.HTTP_200_OK)
