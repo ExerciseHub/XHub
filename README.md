@@ -18,27 +18,37 @@
 | 유진수 | [Link](https://github.com/YuJinsoo) |
 
 
-## 프로젝트 실행 방법
-- Windows 에서 PowerShell
-- Mac 에서 zsh
+## 구동 방식
+- Windows : PowerShell 로 실행
+- Mac : zsh 로 실행
 
 ```
-- docker compose build
-- docker compose up -d
+사전작업:
+- git clone 으로 본 repository 의 main branch 를 받습니다.
+
+최초 실행 시,
+- docker compose up --build -d
 - docker compose run django python manage.py collectstatic
 - docker compose run django python manage.py makemigrations
 - docker compose run django python manage.py migrate
-- docker compose run django python manage.py runserver
+
+이 후 실행 시,
+docker compose up -d
 ```
 
+## 테스트 계정
+- email: `xhubadmin@example.com`
+- password : `xhubpw123`
+- http://54.248.217.183/admin 
 
-## 개발기간 - TODO
-- 2023-08 ~ 2023-09 (1.5개월)
-- 기간 별 구현 작성 예정 (예: 스프린트 2주간격) 
+
+## 개발 기간
+- 2023.08 ~ 2023.10 (1.5개월)
+- 기획, 테스트, 클라이언트 개발을 포함한 기간입니다.
 
 
 ## 개발환경
-- Python 3.10+ (버전 점검. 다름!)
+- python:3.11.4-alpine3.18
 - python-decouple 3.8
 - Django 4.2+
 - DRF  3.14.0
@@ -47,7 +57,7 @@
 - psycopg2 2.9+
 - Docker
 
-그 외 requirements.txt 참고 부탁드립니다.
+그 외 설치된 패키지는 requirements.txt 를 참고 부탁드립니다.
 
 
 ## 배포환경
@@ -55,7 +65,7 @@
     - Lightsail
     - Ubuntu 22.04, 2 vCPU, 2G(RAM), 60 GB SSD
 - Docker
-  - 필요 부분들을 docker container로 만들고 `docker compose` 명령어를 이용해 한 번에 설치가 가능하도록 개발
+  - 필요 부분들을 docker container로 만들고 `docker compose` 명령어를 이용해 한 번에 설치가 가능하도록 구성
   - 도커허브 이미지로 배포
 - 웹서버
   - Nginx
