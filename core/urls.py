@@ -31,10 +31,10 @@ urlpatterns = [
     
     # swagger
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    
     path('player/', include('player.urls')),
     path('quickmatch/', include('quickmatch.urls')),
     path('board/', include('board.urls')),
-    path('', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 ]
 
 # img
