@@ -41,10 +41,16 @@
 - Python 3.10+ (버전 점검. 다름!)
 - python-decouple 3.8
 - Django 4.2+
-- DRF  3.14.0
+- DRF 3.14+
 - DRF-simplejwt 5.2+
 - swagger-ui-py 22.7+
 - psycopg2 2.9+
+- celery 5.3+
+- channels 4.0+
+- channels-redis 4.1+
+- daphne 4.0+
+- flake8 6.1+
+- Pillow 10.0+
 - Docker
 
 그 외 requirements.txt 참고 부탁드립니다.
@@ -64,19 +70,16 @@
 
 
 ## 프로젝트 구성도
+![Alt text](asset/system.png)
 - Web 서버로 NginX
 - HTTP와 Websocket을 처리하는 서버를 gunicorn과 daphne로 따로 구성
-![Alt text](asset/system.png)
+- player, quickmatch, board 앱으로 구성되어있고, 프로젝트 앱은 core 입니다.
+- player와 quickmatch에는 실시간 채팅 기능을구현하기 위해 consumers.py 가 있습니다.
+- channels_jwt_auth_middleware 폴더는 채팅 기능에서 jwt인증을 위해 필요한 미들웨어 입니다.
 
 
 ## 프로젝트 흐름도
 ![Alt text](asset/flowchart.png)
-
-
-## 폴더트리
-- core, player, quickmatch, board 앱으로 구성되어있고, 프로젝트 앱은 core 입니다.
-- player와 quickmatch에는 실시간 채팅 기능을구현하기 위해 consumers.py 가 있습니다.
-- channels_jwt_auth_middleware 폴더는 채팅 기능에서 jwt인증을 위해 필요한 미들웨어 입니다.
 
 
 ## ERD
