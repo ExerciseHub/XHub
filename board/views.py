@@ -4,9 +4,28 @@ from rest_framework.permissions import IsAuthenticated, AllowAny, BasePermission
 from rest_framework.response import Response
 from rest_framework import status, permissions
 from rest_framework.pagination import PageNumberPagination
+from drf_yasg.utils import swagger_auto_schema
 
 from .models import Post, Comment
 from .serializers import PostSerializers, CommentSerializer
+
+
+@swagger_auto_schema(
+    operation_description="다음은 board app에 대한 설명입니다.."
+)
+class PostListView(ListAPIView):
+    """
+    게시판의 모든 게시글 보기.
+
+    모든 글 개체를 JSON 형식으로 반환합니다.
+    """
+    permission_classes = [AllowAny,]
+    queryset = Post.objects.all()
+    serializer_class = PostSerializers
+    filter_backends = [OrderingFilter]
+    ordering_fields = ['created_at', 'like']
+    ordering = ['-created_at']
+
 
 # 게시글 작성 시, 권한을 확인합니다.
 # 권한이 없다면, 401 에러를 반환합니다. 권한이 있다면, 게시글을 작성합니다.
