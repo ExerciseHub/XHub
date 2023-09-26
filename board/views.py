@@ -13,6 +13,15 @@ from .serializers import PostSerializers, CommentSerializer
 
 ### Post
 class PostCreateView(CreateAPIView):
+    """
+    게시글 작성
+
+    - gather_title: string = 게시글 제목입니다.
+    - context: string = 게시글 내용입니다.
+    - public: boolean = 공개여부입니다.
+
+    Post 객체가 생성됩니다.
+    """
     permission_classes = [IsAuthenticated]
     queryset = Post.objects.all()
     serializer_class = PostSerializers
@@ -26,7 +35,13 @@ class StandardResultsSetPagination(PageNumberPagination):
     page_size_query_param = 'page_size'
     max_page_size = 1000
 
+
 class PostListView(ListAPIView):
+    """
+    게시판의 모든 게시글을 봅니다.
+
+    JSON 형식으로 모든 Post 객체를 반환합니다.
+    """
     permission_classes = [AllowAny,]
     queryset = Post.objects.all()
     serializer_class = PostSerializers
@@ -37,6 +52,13 @@ class PostListView(ListAPIView):
 
 
 class PostDetailView(RetrieveAPIView):
+    """
+    작성된 게시글의 상세페이지를 봅니다.
+
+    - id: int = 게시글 id 값을 받습니다.
+
+    id 값에 맞는 Post 객체를 반환합니다.
+    """
     queryset = Post.objects.all()
     serializer_class = PostSerializers
     permission_classes = [AllowAny]
@@ -44,6 +66,13 @@ class PostDetailView(RetrieveAPIView):
 
 
 class LikePostView(UpdateAPIView):
+    """
+    작성된 게시글이 맘에 들 경우 좋아요를 합니다.
+
+    - id: int = Post 객체의 id 값을 받습니다.
+
+    상황에 맞는 message 값이 반환됩니다.
+    """
     queryset = Post.objects.all()
     serializer_class = PostSerializers
     permission_classes = [IsAuthenticated,]
@@ -66,6 +95,13 @@ class LikePostView(UpdateAPIView):
 
 
 class UpdatePostView(RetrieveUpdateAPIView):
+    """
+    작성되어 있는 게시글을 수정합니다.
+
+    - id: int = 수정을 원하는 Post 객체의 id 값을 받습니다.
+
+    수정된 Post 객체를 반환합니다.
+    """
     queryset = Post.objects.all()
     serializer_class = PostSerializers
     permission_classes = [IsAuthenticated]
@@ -85,6 +121,13 @@ class IsOwner(BasePermission):
 
 
 class PostDeleteView(DestroyAPIView):
+    """
+    작성된 게시글을 삭제합니다.
+
+    - id: int = 삭제한 게시글의 객체 id 값을 받습니다.
+
+
+    """
     queryset = Post.objects.all()
     serializer_class = PostSerializers
     permission_classes = (IsAuthenticated, IsOwner)
@@ -93,6 +136,14 @@ class PostDeleteView(DestroyAPIView):
 
 ### Comment
 class CommentWriteView(CreateAPIView):
+    """
+    작성된 게시글에 댓글을 답니다.
+
+    - content: string = 댓글 내용을 입력받습니다.
+    - board_id: int = 댓글을 작성할 Post 객체의 id 값을 입력받습니다.
+
+    Comment 객체가 반환됩니다.
+    """
     permission_classes = [IsAuthenticated]
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
@@ -108,6 +159,15 @@ class CommentWriteView(CreateAPIView):
 
 
 class UpdateCommmentView(RetrieveUpdateAPIView):
+    """
+    작성된 댓글을 수정합니다.
+
+    - content: string = 수정할 댓글내용을 입력받습니다.
+    - board_id: int = 댓글이 작성된 Post 객체의 id 값을 받습니다.
+    - id: int = 수정을 원하는 Comment 객체의 id 값을 받습니다.
+
+    수정된 Comment 객체를 반환합니다.
+    """
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticated]
@@ -115,6 +175,12 @@ class UpdateCommmentView(RetrieveUpdateAPIView):
 
 
 class CommentDeleteView(DestroyAPIView):
+    """
+    작성된 댓글을 삭제합니다.
+
+    - board_id: int = 댓글이 작성된 Post 객체의 id 값을 입력받습니다.
+    - id: int = 삭제를 원하는 Comment 객체의 id 값을 받습니다.
+    """
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = (IsAuthenticated, IsOwner)
@@ -122,6 +188,14 @@ class CommentDeleteView(DestroyAPIView):
 
 
 class LikeCommentView(UpdateAPIView):
+    """
+    작성된 댓글이 맘에들 경우 좋아요를 합니다.
+
+    - board_id: int = 댓글이 작성된 Post 객체의 id 값을 입력받습니다.
+    - id: int = Post 객체의 id 값을 입력합니다.
+
+    상황에 맞는 message 값이 반환됩니다.
+    """
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticated,]
@@ -144,6 +218,13 @@ class LikeCommentView(UpdateAPIView):
 
 
 class PostCommentsListView(ListAPIView):
+    """
+    특정 게시판의 모든 댓글을 확인합니다.
+
+    - board_id: int = 모든 댓글을 확인하고 싶은 Post 객체의 id 값을 받습니다.
+
+    특정 Post 객체의 작성된 댓글을 반환합니다.
+    """
     serializer_class = CommentSerializer
     permission_classes = [AllowAny,]
 
