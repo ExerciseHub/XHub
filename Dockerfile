@@ -6,7 +6,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 ENV PATH="/py/bin:$PATH"
 
-# Python 및 PostgreSQL에 필요한 시스템 패키지를 설치합니다.  # 여기에 libffi-dev 추가
+# Python 및 PostgreSQL에 필요한 시스템 패키지를 설치합니다.
 RUN apk update \
     && apk add --no-cache postgresql-dev gcc musl-dev jpeg-dev zlib-dev libffi-dev \
     && python3 -m ensurepip \
@@ -25,34 +25,13 @@ RUN python -m venv /py
 RUN /py/bin/pip install --upgrade pip \
     && /py/bin/pip install -r requirements.txt
 
-# 빌드에만 필요한 패키지를 제거합니다.  # 여기에 libffi-dev 추가
+# 빌드에만 필요한 패키지를 제거합니다.
 RUN apk del gcc musl-dev libffi-dev
-
-# 디렉터리가 존재하는 경우에만 chmod 명령을 실행합니다.
-# RUN if [ -d "/app/staticfiles" ]; then chmod -R 755 /app/staticfiles; fi
-
-# 비권한 사용자 생성
-# RUN adduser \
-#     --disabled-password \
-#     --no-create-home \
-#     django-user
-
-# staticfiles 디렉토리 생성 및 권한 설정
-# RUN mkdir -p /app/staticfiles && chown -R django-user:django-user /app/staticfiles
-
-# RUN mkdir -p /app/media && chown -R django-user:django-user /app/media
-
-
-# 비권한 사용자로 전환
-# USER django-user
-
 
 
 # 컨테이너 외부에서 8000 포트에 액세스할 수 있도록 합니다.
 EXPOSE 8000
 
 # Django 서버를 시작하는 명령을 실행합니다.
-# CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000", "--timeout", "120"]
-# Daphne 실행을 위해서 추가:
 ARG SERVICE_TYPE=django
 CMD ["sh", "-c", "if [ \"$SERVICE_TYPE\" = \"daphne\" ]; then daphne -u /tmp/daphne.sock core.asgi:application; else gunicorn core.wsgi:application --bind 0.0.0.0:8000 --timeout 120; fi"]
