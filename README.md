@@ -144,5 +144,3 @@ docker compose up -d
 - 기능 개발 브런치 : appname-function
     - ex) player-logout, quickmatch-create ...
     - 기능 개발 브랜치 완료 시 개발 브랜치(develop) 으로 merge
-
-
