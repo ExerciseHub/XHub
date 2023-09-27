@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from rest_framework import status, permissions
 from rest_framework.pagination import PageNumberPagination
 
+from drf_yasg.utils import swagger_auto_schema
+
 from .models import Post, Comment
 from .serializers import PostSerializers, CommentSerializer
 
@@ -13,6 +15,7 @@ from .serializers import PostSerializers, CommentSerializer
 # 권한이 없다면, 401 에러를 반환합니다. 권한이 있다면, 게시글을 작성합니다.
 
 ### Post
+@swagger_auto_schema(tags=["게시판"])
 class PostCreateView(CreateAPIView):
     """
     게시글 작성
@@ -37,6 +40,7 @@ class StandardResultsSetPagination(PageNumberPagination):
     max_page_size = 1000
 
 
+@swagger_auto_schema(tags=["게시판"])
 class PostListView(ListAPIView):
     """
     게시판의 모든 게시글을 봅니다.
@@ -52,6 +56,7 @@ class PostListView(ListAPIView):
     pagination_class = StandardResultsSetPagination
 
 
+@swagger_auto_schema(tags=["게시판"])
 class PostDetailView(RetrieveAPIView):
     """
     작성된 게시글의 상세페이지를 봅니다.
@@ -66,6 +71,7 @@ class PostDetailView(RetrieveAPIView):
     lookup_field = 'id'  # URL에서 Post ID를 어떤 필드로 받아올지 지정
 
 
+@swagger_auto_schema(tags=["게시판"])
 class LikePostView(UpdateAPIView):
     """
     작성된 게시글이 맘에 들 경우 좋아요를 합니다.
@@ -95,6 +101,7 @@ class LikePostView(UpdateAPIView):
             return Response({"message": "좋아요 추가"}, status=status.HTTP_200_OK)
 
 
+@swagger_auto_schema(tags=["게시판"])
 class UpdatePostView(RetrieveUpdateAPIView):
     """
     작성되어 있는 게시글을 수정합니다.
@@ -109,6 +116,7 @@ class UpdatePostView(RetrieveUpdateAPIView):
     lookup_field = 'id'
 
 
+@swagger_auto_schema(tags=["게시판"])
 class IsOwner(BasePermission):
     """
     글을 작성 한, 로그인 한 해당 유저만이 글을 삭제 할 수 있도록.
@@ -121,6 +129,7 @@ class IsOwner(BasePermission):
         return obj.writer == request.user
 
 
+@swagger_auto_schema(tags=["게시판"])
 class PostDeleteView(DestroyAPIView):
     """
     작성된 게시글을 삭제합니다.
@@ -136,6 +145,7 @@ class PostDeleteView(DestroyAPIView):
 
 
 ### Comment
+@swagger_auto_schema(tags=["게시판"])
 class CommentWriteView(CreateAPIView):
     """
     작성된 게시글에 댓글을 답니다.
@@ -159,6 +169,7 @@ class CommentWriteView(CreateAPIView):
         serializer.save(writer=self.request.user, post=post)  # 로그인 한 유저가 작성자로 저장 + 가져온 ID에 해당하는 post에 저장
 
 
+@swagger_auto_schema(tags=["게시판"])
 class UpdateCommmentView(RetrieveUpdateAPIView):
     """
     작성된 댓글을 수정합니다.
@@ -175,6 +186,7 @@ class UpdateCommmentView(RetrieveUpdateAPIView):
     lookup_field = 'id'
 
 
+@swagger_auto_schema(tags=["게시판"])
 class CommentDeleteView(DestroyAPIView):
     """
     작성된 댓글을 삭제합니다.
@@ -188,6 +200,7 @@ class CommentDeleteView(DestroyAPIView):
     lookup_field = 'id'
 
 
+@swagger_auto_schema(tags=["게시판"])
 class LikeCommentView(UpdateAPIView):
     """
     작성된 댓글이 맘에들 경우 좋아요를 합니다.
@@ -218,6 +231,7 @@ class LikeCommentView(UpdateAPIView):
             return Response({"message": "좋아요 추가"}, status=status.HTTP_200_OK)
 
 
+@swagger_auto_schema(tags=["게시판"])
 class PostCommentsListView(ListAPIView):
     """
     특정 게시판의 모든 댓글을 확인합니다.
