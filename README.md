@@ -53,6 +53,7 @@ docker compose up -d
 - Django 4.2+
 - DRF 3.14+
 - DRF-simplejwt 5.2+
+- drf-yasg==1.21+
 - swagger-ui-py 22.7+
 - psycopg2 2.9+
 - celery 5.3+
