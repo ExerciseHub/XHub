@@ -23,9 +23,7 @@ jobs:
           ssh-keyscan 54.248.217.183 >> ~/.ssh/known_hosts
           ssh -v ubuntu@54.248.217.183 <<EOF
             cd /home/ubuntu/XHub
-            docker compose down
-            docker compose pull
-            docker compose up -d
             git checkout main
             git pull origin main
+            ./docker-initial.sh
           EOF
