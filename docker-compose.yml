@@ -1,4 +1,4 @@
-version: '3'  # Docker Compose의 버전을 지정합니다.
+version: '3.8'  # Docker Compose의 버전을 지정합니다.
 
 services:  # 서비스 목록을 정의합니다.
   django:  # Django 애플리케이션 서비스를 정의합니다.
