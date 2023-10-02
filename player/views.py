@@ -36,6 +36,15 @@ from .serializers import (
 r = redis.StrictRedis(host='redis', port=6379, db=0)
 
 class RegisterView(CreateAPIView):
+    """
+    ### 회원가입 API
+    이 API 뷰는 시스템에 새로운 사용자를 등록하는데 사용됩니다.
+    
+    - **이메일**: 사용자의 이메일 주소입니다.
+    - **비밀번호**: 새 사용자 계정의 비밀번호입니다.
+    
+    회원가입 성공을 나타내는 메시지가 포함된 JSON 객체를 반환합니다.
+    """
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
@@ -49,6 +58,15 @@ class RegisterView(CreateAPIView):
 
 
 class Login(CreateAPIView):
+    """
+    ### 로그인 API
+    이 API 뷰는 사용자의 자격을 검증하고 JWT 토큰을 반환하여 사용자를 로그인합니다.
+    
+    - **이메일**: 사용자의 이메일 주소입니다.
+    - **비밀번호**: 사용자 계정의 비밀번호입니다.
+    
+    `refresh`와 `access` JWT 토큰이 포함된 JSON 객체를 반환합니다.
+    """
     permission_classes = (AllowAny, )
     serializer_class = LoginSerializer
 
@@ -68,6 +86,14 @@ class Login(CreateAPIView):
 
 
 class Logout(DestroyAPIView):
+    """
+    ### 로그아웃 API
+    이 API 뷰는 사용자의 JWT 토큰을 무효화하여 사용자를 로그아웃합니다.
+    
+    Authorization 헤더에 유효한 JWT 토큰이 필요합니다.
+    
+    로그아웃 성공을 나타내는 메시지가 포함된 JSON 객체를 반환합니다.
+    """
     permission_classes = (IsAuthenticated,)
 
     def delete(self, request, *args, **kwargs):
@@ -78,6 +104,15 @@ class Logout(DestroyAPIView):
 
 
 class Update(RetrieveUpdateAPIView):
+    """
+    ### 사용자 정보 수정 API
+    이 API 뷰는 인증된 사용자의 정보를 수정합니다.
+    
+    - **currentPassword**: 현재 사용자의 비밀번호입니다. 비밀번호 확인을 위해 필요합니다.
+    - **email, nickname 등**: 수정하려는 사용자 정보 필드입니다.
+    
+    사용자 정보 수정 성공을 나타내는 메시지가 포함된 JSON 객체를 반환합니다.
+    """
     permission_classes = (IsAuthenticated,)
     serializer_class = UserUpdateSerializer
 
@@ -104,6 +139,14 @@ class Update(RetrieveUpdateAPIView):
 
 
 class PasswordChangeView(UpdateAPIView):
+    """
+    ### 비밀번호 변경 API
+    이 API 뷰는 인증된 사용자의 비밀번호를 변경합니다.
+    
+    - **new_password**: 사용자의 새 비밀번호입니다.
+    
+    비밀번호 변경 성공을 나타내는 메시지가 포함된 JSON 객체를 반환합니다.
+    """
     queryset = User.objects.all()
     serializer_class = PasswordChangeSerializer
     permission_classes = [IsAuthenticated]
@@ -117,6 +160,12 @@ class PasswordChangeView(UpdateAPIView):
 
 
 class UnregisterUserView(APIView):
+    """
+    ### 회원 탈퇴 API
+    이 API 뷰를 통해 인증된 사용자는 회원 탈퇴를 할 수 있습니다.
+    
+    회원 탈퇴 성공을 나타내는 메시지가 포함된 JSON 객체를 반환합니다.
+    """
     permission_classes = [IsAuthenticated]
 
     def delete(self, request):
@@ -126,6 +175,14 @@ class UnregisterUserView(APIView):
 
 
 class UserListView(ListAPIView):
+    """
+    ### 사용자 목록 조회 API
+    이 API 뷰는 시스템에 등록된 모든 사용자의 목록을 조회합니다.
+    
+    인증된 사용자만이 이 API 뷰를 사용할 수 있습니다.
+    
+    사용자 목록이 포함된 JSON 객체를 반환합니다.
+    """
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated,]
@@ -134,6 +191,12 @@ class UserListView(ListAPIView):
 
 
 class FriendListView(ListAPIView):
+    """
+    ### 친구 목록 조회 API
+    이 API 뷰는 인증된 사용자의 친구 목록을 조회합니다.
+    
+    친구 목록이 포함된 JSON 객체를 반환합니다.
+    """
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated,]
     filter_backends = [filters.SearchFilter]
@@ -145,6 +208,15 @@ class FriendListView(ListAPIView):
 
 
 class AddFriendView(CreateAPIView):
+    """
+    ### 친구 추가 API
+    이 API 뷰는 다른 사용자를 친구 목록에 추가합니다.
+    
+    - **friend_id**: 친구로 추가하려는 사용자의 ID입니다.
+    - **email**: 친구로 추가하려는 사용자의 이메일 주소입니다.
+    
+    친구 추가 성공을 나타내는 메시지가 포함된 JSON 객체를 반환합니다.
+    """
     permission_classes = [IsAuthenticated]
     serializer_class = UserSerializer
 
@@ -172,6 +244,14 @@ class AddFriendView(CreateAPIView):
 
 
 class RemoveFriendView(DestroyAPIView):
+    """
+    ### 친구 제거 API
+    이 API 뷰는 친구 목록에서 특정 사용자를 제거합니다.
+    
+    - **friend_id**: 친구 목록에서 제거하려는 사용자의 ID입니다.
+    
+    친구 제거 성공을 나타내는 메시지가 포함된 JSON 객체를 반환합니다.
+    """
     permission_classes = [IsAuthenticated]
     serializer_class = UserSerializer
     lookup_field = 'friend_id'
@@ -198,6 +278,14 @@ class RemoveFriendView(DestroyAPIView):
 
 ### chat
 class MessageListView(ListAPIView):
+    """
+    ### 메시지 목록 조회 API
+    이 API 뷰는 특정 채팅방의 메시지 목록을 조회합니다.
+    
+    - **room_id**: 메시지 목록을 조회하려는 채팅방의 ID입니다.
+    
+    메시지 목록이 포함된 JSON 객체를 반환합니다.
+    """
     queryset = DirectMessage.objects.all()
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated]
@@ -245,6 +333,14 @@ class MessageListView(ListAPIView):
 
 
 class CreateRoomView(CreateAPIView):
+    """
+    ### 채팅방 생성 API
+    이 API 뷰는 새로운 채팅방을 생성합니다.
+    
+    - **partner_id**: 채팅방에 참여할 파트너 사용자의 ID입니다.
+    
+    채팅방 생성 성공을 나타내는 메시지와 채팅방 ID가 포함된 JSON 객체를 반환합니다.
+    """
     queryset = DMRoom.objects.all()
     serializer_class = RoomSerializer
     permission_classes = [IsAuthenticated]
@@ -271,6 +367,12 @@ class CreateRoomView(CreateAPIView):
 
 
 class CheckLoginUserView(APIView):
+    """
+    ### 로그인 사용자 확인 API
+    이 API 뷰는 현재 로그인된 사용자의 정보를 확인합니다.
+    
+    로그인된 사용자의 이메일과 ID가 포함된 JSON 객체를 반환합니다.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
