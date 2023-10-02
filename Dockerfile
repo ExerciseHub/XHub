@@ -1,5 +1,6 @@
 # 공식 Python 런타임을 기반 이미지로 사용합니다.
 FROM python:3.11.4-alpine3.18
+LABEL maintainer="https://github.com/mireu-san"
 
 # 환경 변수 설정
 ENV PYTHONPATH /app:$PYTHONPATH
