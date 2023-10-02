@@ -18,9 +18,6 @@ WORKDIR /app
 # 현재 디렉토리의 내용을 컨테이너의 /app에 복사합니다.
 COPY . /app
 
-# Python 가상 환경 설정
-RUN python -m venv /py
-
 # requirements.txt에 지정된 패키지를 설치합니다.
 RUN /py/bin/pip install --upgrade pip \
     && /py/bin/pip install -r requirements.txt
