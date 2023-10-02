@@ -78,6 +78,8 @@ docker compose up -d
   - Nginx
   - Django WSGI: gunicorn
   - Django ASGI: daphne
+- DB
+  - postgreSQL
 
 
 ## 프로젝트 구성도
