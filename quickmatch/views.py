@@ -25,6 +25,9 @@ User = get_user_model()
 
 
 class CreateMeeting(APIView):
+    """
+    1회성 모임을 만듭니다.
+    """
     permission_classes = [IsAuthenticated]
     
     def get(self, request):
@@ -70,6 +73,9 @@ class CreateMeeting(APIView):
 
 
 class DeleteMeeting(APIView):
+    """
+    생성된 1회성 모임을 제거합니다.
+    """
     permission_classes = [IsAuthenticated]
     
     def get(self, request, quickmatchId):
@@ -89,6 +95,9 @@ class DeleteMeeting(APIView):
 
 
 class JoinMeeting(APIView):
+    """
+    생성된 1회성 모임에 참석합니다.
+    """
     permission_classes = [IsAuthenticated]
     
     def get(self, request, quickmatchId):
@@ -118,6 +127,9 @@ class JoinMeeting(APIView):
 
 
 class LeaveMeeting(APIView):
+    """
+    참석한 1회성 모임을 떠납니다.
+    """
     permission_classes = [IsAuthenticated]
     
     def get(self, request, quickmatchId):
@@ -144,6 +156,9 @@ class LeaveMeeting(APIView):
 
 
 class ChangMeetingContents(APIView):
+    """
+    생성된 1회성 모임의 정보를 수정합니다.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request, quickmatchId):
@@ -171,6 +186,11 @@ class ChangMeetingContents(APIView):
 
 
 class ChangeMeetingStatus(APIView):
+    """
+    생성된 1회성 모임의 상태(status)값을 변경합니다.
+
+    - quickmatchId: int = Meeting 객체의 id 값을 받습니다.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request, quickmatchId):
@@ -194,6 +214,9 @@ class ChangeMeetingStatus(APIView):
 
 
 class MeetingSearchView(ListAPIView):
+    """
+    생성된 1회성 모임들을 전부 불러옵니다.
+    """
     serializer_class = MeetingSerializer
     permission_classes = [AllowAny,]
 
@@ -225,12 +248,20 @@ class MeetingSearchView(ListAPIView):
 
 
 class MeetingListView(ListCreateAPIView):
+    """
+    생성된 1회성 모임들을 전부 불러옵니다.
+    """
     queryset = Meeting.objects.all().order_by('-created_at')
     serializer_class = MeetingSerializer
     permission_classes = [AllowAny,]
 
 
 class MeetingDetailView(RetrieveAPIView):
+    """
+    생성된 1회성 모임의 상세페이지를 봅니다.
+
+    - quickmatchId: int = Meeting 객체의 id 값을 받습니다.
+    """
     queryset = Meeting.objects.all()
     serializer_class = MeetingDetailSerializer
     permission_classes = [AllowAny,]
@@ -239,6 +270,12 @@ class MeetingDetailView(RetrieveAPIView):
 
 
 class EvaluateMemberView(APIView):
+    """
+    참석한 1회성 모임의 멤버들을 평가합니다.
+
+    - member_id: int = 평가할 멤버의 id 값을 받습니다.
+    - meeting_id: int = 참석한 1회성 모임의 id 값을 받습니다.
+    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request, member_id, meeting_id):
@@ -273,6 +310,11 @@ class EvaluateMemberView(APIView):
 
 
 class JoinMeetingRoom(APIView):
+    """
+    1회성 모임 내에서 1 : N 채팅을 합니다.
+
+    - quickmatchId: int = 채팅에 참여할 1회성 모임의 id 값을 받습니다.
+    """
     permission_classes = [IsAuthenticated]
     
     def post(self, request, quickmatchId):
@@ -292,6 +334,11 @@ class JoinMeetingRoom(APIView):
 
 
 class LeaveMeetingRoom(APIView):
+    """
+    참석한 1회성 모임의 채팅방을 떠납니다.
+
+    - quickmatchId: int = 채팅을 떠날 Meeting 객체의 id 값을 받습니다.
+    """
     permission_classes = [IsAuthenticated]
     
     def post(self, request, quickmatchId):
@@ -312,6 +359,11 @@ class LeaveMeetingRoom(APIView):
 
 
 class IsMemberView(APIView):
+    """
+    사용자가 1회성 모임 멤버인지 확인합니다.
+
+    - meeting_id: int = 멤버 확인을 위한 Meeting 객체의 id 값을 받습니다.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request, meeting_id):
@@ -323,15 +375,23 @@ class IsMemberView(APIView):
 
         return Response({'is_member': is_member})
 
+
 # 사용자의 모든 알림 목록을 반환하거나 새로운 알림 생성
 class NotificationListCreateView(ListCreateAPIView):
+    """
+    생성된 알림이 있다면 사용자에게 반환하거나 새로운 알림을 생성합니다.
+    """
     serializer_class = NotificationSerializer
 
     def get_queryset(self):
         return self.request.user.notifications.filter(read=False)
 
+
 # 특정 알림의 상세 정보를 가져오거나 수정 및 삭제
 class NotificationRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
+    """
+    특정 알림의 상세 정보를 제공하거나 수정 및 삭제합니다.
+    """
     serializer_class = NotificationSerializer
 
     def get_queryset(self):
