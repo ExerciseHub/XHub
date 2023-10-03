@@ -74,5 +74,6 @@ jobs:
           cd /home/ubuntu/XHub
           git checkout main
           git pull origin main
+          chmod +x docker-initial.sh
           ./docker-initial.sh
         EOF
