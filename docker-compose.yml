@@ -1,4 +1,4 @@
-version: '3'  # Docker Compose의 버전을 지정합니다.
+version: '3.8'  # Docker Compose의 버전을 지정합니다.
 
 services:  # 서비스 목록을 정의합니다.
   django:  # Django 애플리케이션 서비스를 정의합니다.
@@ -83,23 +83,6 @@ services:  # 서비스 목록을 정의합니다.
       - django # django 서비스가 시작된 후에 nginx 서비스를 시작합니다.
       - daphne
   
-  # celery_worker:
-  #   image: develop-django
-  #   command: celery -A core worker --loglevel=info
-  #   volumes:
-  #     - .:/app
-  #   depends_on:
-  #     - db
-  #     - redis
-
-  # celery_beat:
-  #   image: develop-django
-  #   command: celery -A core beat --loglevel=info
-  #   volumes:
-  #     - .:/app
-  #   depends_on:
-  #     - db
-  #     - redis
   celery_worker:
     build:
       context: .
