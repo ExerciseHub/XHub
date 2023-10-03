@@ -12,7 +12,7 @@ jobs:
 
     services:
       db:
-        image: postgres:12
+        image: postgres:15.4-alpine3.18
         env:
           POSTGRES_DB: ${{ secrets.DB_NAME }}
           POSTGRES_USER: ${{ secrets.DB_USER }}
@@ -35,6 +35,30 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     
+    - name: Check for migration issues
+      env:
+        DB_HOST: localhost  # Connect to the service container
+        DB_PORT: 5432
+        DB_NAME: ${{ secrets.DB_NAME }}
+        DB_USER: ${{ secrets.DB_USER }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        DJANGO_DEBUG: ${{ secrets.DJANGO_DEBUG }}
+      run: |
+        python manage.py check
+    
+    - name: Apply database migrations
+      env:
+        DB_HOST: localhost  # Connect to the service container
+        DB_PORT: 5432
+        DB_NAME: ${{ secrets.DB_NAME }}
+        DB_USER: ${{ secrets.DB_USER }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        DJANGO_DEBUG: ${{ secrets.DJANGO_DEBUG }}
+      run: |
+        python manage.py migrate
+    
     - name: Run tests
       env:
         DB_HOST: localhost  # Connect to the service container
@@ -45,5 +69,4 @@ jobs:
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
         DJANGO_DEBUG: ${{ secrets.DJANGO_DEBUG }}
       run: |
-        sleep 10
         python manage.py test player
