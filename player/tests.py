@@ -1,8 +1,9 @@
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
-from .models import User
-
+# from .models import User
+# player/tests.py
+from player.models import User
 
 class RegistrationTestCase(APITestCase):
     def test_registration(self):
