@@ -5,25 +5,45 @@ on:
       - main
 
 jobs:
-  update-lighthouse:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - name: Add user to docker group
-        run: sudo usermod -aG docker $USER && sudo service docker restart
+    - name: Checkout code
+      uses: actions/checkout@v2
+    
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 311  # Adjust as per your requirement
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run tests
+      run: |
+        python manage.py test player
+  
+    
+  update-lighthouse:
+    needs: test  # Ensuring deployment only happens after tests succeed
+    runs-on: ubuntu-latest
+    steps:
+    - name: Add user to docker group
+      run: sudo usermod -aG docker $USER && sudo service docker restart
         
-        # SSH 연결
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.6.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-        # SSH 연결 후 명령어 실행
-      - name: SSH and Update
-        run: |
-          ssh-keyscan 54.248.217.183 >> ~/.ssh/known_hosts
-          ssh -v ubuntu@54.248.217.183 <<EOF
-            cd /home/ubuntu/XHub
-            git checkout main
-            git pull origin main
-            ./docker-initial.sh
-          EOF
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.6.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+    
+    - name: SSH and Update
+      run: |
+        ssh-keyscan 54.248.217.183 >> ~/.ssh/known_hosts
+        ssh -v ubuntu@54.248.217.183 <<EOF
+          cd /home/ubuntu/XHub
+          git checkout main
+          git pull origin main
+          ./docker-initial.sh
+        EOF

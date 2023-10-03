@@ -30,6 +30,9 @@ class User(AbstractUser):
     email = models.EmailField(max_length=200, unique=True)
     activity_point = models.PositiveIntegerField(default=0)
 
+    class Meta:
+        app_label = 'player'
+
     # Profile
     nickname = models.CharField(max_length=100)
     profile_img = models.ImageField(upload_to='images/profile/', blank=True, null=True)
