@@ -45,6 +45,7 @@ jobs:
         run: |
           python manage.py makemigrations player
           python manage.py makemigrations quickmatch
+          python manage.py makemigrations board
       
       - name: Apply database migrations
         run: python manage.py migrate
