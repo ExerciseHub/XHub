@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SECRET_KEY: ${{ secrets.SECRET_KEY }} # 환경 변수를 설정합니다. GitHub Secrets에서 SECRET_KEY를 가져옵니다.
+      DJANGO_DEBUG: ${{ secrets.DJANGO_DEBUG }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
