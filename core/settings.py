@@ -98,7 +98,9 @@ INSTALLED_APPS = [
     'corsheaders',
     
     # 내부 기능(앱)
+    # user = player 커스텀 경로 대응
     'player',
+    # 'player.apps.PlayerConfig',
     'quickmatch',
     'board',
 ]
