@@ -1,15 +1,26 @@
-name: Update Lightsail
+name: Django CI
+
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      SECRET_KEY: ${{ secrets.SECRET_KEY }} # 환경 변수를 설정합니다. GitHub Secrets에서 SECRET_KEY를 가져옵니다.
-      DJANGO_DEBUG: ${{ secrets.DJANGO_DEBUG }}
+
+    services:
+      db:
+        image: postgres:12
+        env:
+          POSTGRES_DB: ${{ secrets.DB_NAME }}
+          POSTGRES_USER: ${{ secrets.DB_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -25,28 +36,14 @@ jobs:
         pip install -r requirements.txt
     
     - name: Run tests
+      env:
+        DB_HOST: localhost  # Connect to the service container
+        DB_PORT: 5432
+        DB_NAME: ${{ secrets.DB_NAME }}
+        DB_USER: ${{ secrets.DB_USER }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        DJANGO_DEBUG: ${{ secrets.DJANGO_DEBUG }}
       run: |
+        sleep 10
         python manage.py test player
-  
-    
-  update-lighthouse:
-    needs: test  # Ensuring deployment only happens after tests succeed
-    runs-on: ubuntu-latest
-    steps:
-    - name: Add user to docker group
-      run: sudo usermod -aG docker $USER && sudo service docker restart
-        
-    - name: Set up SSH
-      uses: webfactory/ssh-agent@v0.6.0
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-    
-    - name: SSH and Update
-      run: |
-        ssh-keyscan 54.248.217.183 >> ~/.ssh/known_hosts
-        ssh -v ubuntu@54.248.217.183 <<EOF
-          cd /home/ubuntu/XHub
-          git checkout main
-          git pull origin main
-          ./docker-initial.sh
-        EOF
