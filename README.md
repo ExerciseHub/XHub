@@ -1,3 +1,6 @@
+# 주의!
+이미지 400kb 로직은 사이즈 맞는지 재확인 후, 명시.
+
 # XHub
 단체 스포츠 모임 플랫폼 (Team sports gathering platform)
 

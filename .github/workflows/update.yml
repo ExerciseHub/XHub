@@ -1,4 +1,4 @@
-name: Update Lighthouse
+name: Update Lightsail
 on:
   push:
     branches:
