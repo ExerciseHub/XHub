@@ -41,14 +41,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       
-      - name: Make migrations for player
-        run: python manage.py makemigrations player
+      - name: Make migrations for player and quickmatch
+        run: |
+          python manage.py makemigrations player
+          python manage.py makemigrations quickmatch
       
       - name: Apply database migrations
         run: python manage.py migrate
       
       - name: Run tests
         run: python manage.py test player
+  
+
   
   update-lighthouse:
     needs: test  # Ensuring deployment only happens after tests succeed
