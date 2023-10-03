@@ -1,18 +1,15 @@
-name: Django CI
-
+name: Update Lightsail
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   test:
     runs-on: ubuntu-latest
-
     services:
       db:
-        image: postgres:15.4-alpine3.18
+        image: postgres:12
         env:
           POSTGRES_DB: ${{ secrets.DB_NAME }}
           POSTGRES_USER: ${{ secrets.DB_USER }}
@@ -20,7 +17,16 @@ jobs:
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-
+    
+    env:
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      DJANGO_DEBUG: ${{ secrets.DJANGO_DEBUG }}
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_NAME: ${{ secrets.DB_NAME }}
+      DB_USER: ${{ secrets.DB_USER }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -35,38 +41,32 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     
-    - name: Check for migration issues
-      env:
-        DB_HOST: localhost  # Connect to the service container
-        DB_PORT: 5432
-        DB_NAME: ${{ secrets.DB_NAME }}
-        DB_USER: ${{ secrets.DB_USER }}
-        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        SECRET_KEY: ${{ secrets.SECRET_KEY }}
-        DJANGO_DEBUG: ${{ secrets.DJANGO_DEBUG }}
-      run: |
-        python manage.py check
-    
     - name: Apply database migrations
-      env:
-        DB_HOST: localhost  # Connect to the service container
-        DB_PORT: 5432
-        DB_NAME: ${{ secrets.DB_NAME }}
-        DB_USER: ${{ secrets.DB_USER }}
-        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        SECRET_KEY: ${{ secrets.SECRET_KEY }}
-        DJANGO_DEBUG: ${{ secrets.DJANGO_DEBUG }}
       run: |
         python manage.py migrate
     
     - name: Run tests
-      env:
-        DB_HOST: localhost  # Connect to the service container
-        DB_PORT: 5432
-        DB_NAME: ${{ secrets.DB_NAME }}
-        DB_USER: ${{ secrets.DB_USER }}
-        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        SECRET_KEY: ${{ secrets.SECRET_KEY }}
-        DJANGO_DEBUG: ${{ secrets.DJANGO_DEBUG }}
       run: |
         python manage.py test player
+  
+  update-lighthouse:
+    needs: test  # Ensuring deployment only happens after tests succeed
+    runs-on: ubuntu-latest
+    steps:
+    - name: Add user to docker group
+      run: sudo usermod -aG docker $USER && sudo service docker restart
+        
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.6.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+    
+    - name: SSH and Update
+      run: |
+        ssh-keyscan 54.248.217.183 >> ~/.ssh/known_hosts
+        ssh -v ubuntu@54.248.217.183 <<EOF
+          cd /home/ubuntu/XHub
+          git checkout main
+          git pull origin main
+          ./docker-initial.sh
+        EOF

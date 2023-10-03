@@ -99,7 +99,8 @@ INSTALLED_APPS = [
     
     # 내부 기능(앱)
     # user = player 커스텀 경로 대응
-    'player.apps.PlayerConfig',
+    'player',
+    # 'player.apps.PlayerConfig',
     'quickmatch',
     'board',
 ]
