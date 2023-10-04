@@ -51,13 +51,11 @@ CHANNEL_LAYERS = {
 }
 
 # 로깅세팅
-LOGGING_DIR = os.path.join(os.path.dirname(__file__), 'logging')
-ABS_LOGGING_DIR = os.path.abspath(LOGGING_DIR)
-
+LOGGING_DIR = "/tmp/logging"
 if not os.path.exists(LOGGING_DIR):
     os.mkdir(LOGGING_DIR)
 
-print("Logging errors to: ", os.path.join(ABS_LOGGING_DIR, 'errors.log'))
+print("Logging errors to: ", os.path.join(LOGGING_DIR, 'errors.log'))
 
 LOGGING = {
     'version': 1,
@@ -76,7 +74,6 @@ LOGGING = {
     'loggers': {
         'django.channels': {
             'handlers': ['websocket'],
-            # 만약 로그의 끝장을 보고 싶다면, 아래의 level 을 DEBUG 로 변경.
             'level': 'DEBUG',
             'propagate': False,
         },
@@ -87,6 +84,7 @@ LOGGING = {
         },
     },
 }
+
 
 # Celery configurations
 CELERY_BROKER_URL = 'redis://redis:6379/0'
