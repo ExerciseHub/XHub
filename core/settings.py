@@ -51,6 +51,12 @@ CHANNEL_LAYERS = {
 }
 
 # 로깅세팅
+LOGGING_DIR = os.path.join(os.path.dirname(__file__), 'logging')
+if not os.path.exists(LOGGING_DIR):
+    os.mkdir(LOGGING_DIR)
+
+print("Logging errors to: ", os.path.join(LOGGING_DIR, 'errors.log'))
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -59,12 +65,23 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
         },
+        'file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOGGING_DIR, 'errors.log'),
+        },
     },
     'loggers': {
         'django.channels': {
             'handlers': ['websocket'],
+            # 만약 로그의 끝장을 보고 싶다면, 아래의 level 을 DEBUG 로 변경.
             'level': 'DEBUG',
             'propagate': False,
+        },
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
         },
     },
 }
