@@ -52,10 +52,12 @@ CHANNEL_LAYERS = {
 
 # 로깅세팅
 LOGGING_DIR = os.path.join(os.path.dirname(__file__), 'logging')
+ABS_LOGGING_DIR = os.path.abspath(LOGGING_DIR)
+
 if not os.path.exists(LOGGING_DIR):
     os.mkdir(LOGGING_DIR)
 
-print("Logging errors to: ", os.path.join(LOGGING_DIR, 'errors.log'))
+print("Logging errors to: ", os.path.join(ABS_LOGGING_DIR, 'errors.log'))
 
 LOGGING = {
     'version': 1,

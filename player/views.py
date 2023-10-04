@@ -43,7 +43,7 @@ class TestLoggingView(View):
         logger = logging.getLogger('django')
         logger.error('player 에서 발생하는 테스트 에러 로그. player/views.py 의 TestLoggingView 참고.')
         return HttpResponse("Logging trigger : player 의 views.py 를 참고하세요.")
-    
+
 
 class RegisterView(CreateAPIView):
     """
