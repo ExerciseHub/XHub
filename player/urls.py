@@ -14,6 +14,7 @@ from .views import (
     CreateRoomView,
     PasswordChangeView,
     CheckLoginUserView,
+    TestLoggingView,
 )
 
 app_name = "player"
@@ -63,4 +64,7 @@ urlpatterns = [
     
     # 로그인된 유저 확인
     path('check/email/', CheckLoginUserView.as_view(), name='check_user'),
+
+    # 로깅 테스트 - player 에만 있음.
+    path('test-logging/', TestLoggingView.as_view(), name='test_logging'),
 ]

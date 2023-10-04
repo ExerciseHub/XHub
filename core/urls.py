@@ -26,12 +26,12 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path('', home, name='home'),
+    # path('', home, name='home'),
+    # 초기화면 swagger 로 지정.
+    path('', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('admin/', admin.site.urls),
     
     # swagger
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    
     path('player/', include('player.urls')),
     path('quickmatch/', include('quickmatch.urls')),
     path('board/', include('board.urls')),

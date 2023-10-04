@@ -19,6 +19,10 @@ RUN apk update \
     && python3 -m ensurepip \
     && pip3 install --no-cache --upgrade pip setuptools \
     && pip install -r requirements.txt \
+    # Logging 디렉토리 생성
+    && mkdir -p /app/core/logging \
+    && chmod -R 775 /app/core/logging \
+    && chown -R nobody:nogroup /app/core/logging \
     && apk del gcc musl-dev libffi-dev
 
 # 컨테이너 외부에서 8000 포트에 액세스할 수 있도록 합니다.

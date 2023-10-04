@@ -21,6 +21,7 @@ services:  # 서비스 목록을 정의합니다.
     volumes:
       # 현재 디렉토리를 컨테이너의 /app 디렉토리에 마운트합니다.
       - .:/app
+      - ./core/logging:/app/core/logging
     hostname: django
 
   db:
@@ -63,7 +64,8 @@ services:  # 서비스 목록을 정의합니다.
       - daphne-socket:/tmp
     hostname: daphne
     # command: ["daphne", "-b", "0.0.0.0", "-p", "8001", "core.asgi:application"]
-    command: ["daphne", "-u", "/tmp/daphne.sock", "core.asgi:application"]
+    command: ["daphne", "-u", "/tmp/daphne1.sock", "core.asgi:application"]
+    # restart: unless-stopped # daphne 가 code 0 로 종료되는 것 대응. 즉, 에러 해결 촉구 트리거. 현재 꺼둠.
 
   nginx:
     build:
