@@ -21,7 +21,7 @@ RUN apk update \
     && pip install -r requirements.txt \
     # Logging 디렉토리 생성
     && mkdir -p /app/core/logging \
-    && chmod -R 777 /app/core/logging \
+    && chmod -R 775 /app/core/logging \
     && chown -R nobody:nogroup /app/core/logging \
     && apk del gcc musl-dev libffi-dev
 
