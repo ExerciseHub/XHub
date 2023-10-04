@@ -60,7 +60,8 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             'position',
             'height',
             'weight',
-            'location',
+            'latitude',
+            'longitude',
             'friend',
         ]
 
