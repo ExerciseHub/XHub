@@ -1,7 +1,9 @@
 import json
 import redis
+import logging
 
-from django.http import Http404
+from django.http import Http404, HttpResponse
+from django.views import View
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.hashers import check_password
 
@@ -32,8 +34,16 @@ from .serializers import (
     PasswordChangeSerializer,
 )
 
-
 r = redis.StrictRedis(host='redis', port=6379, db=0)
+
+
+# 로그
+class TestLoggingView(View):
+    def get(self, request, *args, **kwargs):
+        logger = logging.getLogger('django')
+        logger.error('player 에서 발생하는 테스트 에러 로그. player/views.py 의 TestLoggingView 참고.')
+        return HttpResponse("Logging trigger : player 의 views.py 를 참고하세요.")
+
 
 class RegisterView(CreateAPIView):
     """
