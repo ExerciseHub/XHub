@@ -38,9 +38,11 @@ r = redis.StrictRedis(host='redis', port=6379, db=0)
 
 
 # 로그
+# 주의: 컨테이너 실행 때 에러 보다는, (장고의 경우) 실행 도중에 발생한 에러를 기록.
 class TestLoggingView(View):
     def get(self, request, *args, **kwargs):
         logger = logging.getLogger('django')
+        # 테스트 흔적. /player/test-logging 으로 접속 시, errors.log 에 logger.error 내용이 기록됨.
         logger.error('player 에서 발생하는 테스트 에러 로그. player/views.py 의 TestLoggingView 참고.')
         return HttpResponse("Logging trigger : player 의 views.py 를 참고하세요.")
 
