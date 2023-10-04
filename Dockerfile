@@ -13,7 +13,7 @@ WORKDIR /app
 # 현재 디렉토리의 내용을 컨테이너의 /app에 복사합니다.
 COPY . /app
 
-# Python 및 PostgreSQL에 필요한 시스템 패키지를 설치합니다.  # 여기에 libffi-dev 추가
+# Python 및 PostgreSQL에 필요한 시스템 패키지를 설치합니다.
 RUN apk update \
     && apk add --no-cache postgresql-dev gcc musl-dev jpeg-dev zlib-dev libffi-dev \
     && python3 -m ensurepip \
@@ -21,7 +21,7 @@ RUN apk update \
     && pip install -r requirements.txt \
     # Logging 디렉토리 생성
     && mkdir -p /app/core/logging \
-    && chmod -R 775 /app/core/logging \
+    && chmod -R 777 /app/core/logging \
     && chown -R nobody:nogroup /app/core/logging \
     && apk del gcc musl-dev libffi-dev
 
