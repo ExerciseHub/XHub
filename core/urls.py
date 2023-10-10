@@ -28,7 +28,7 @@ schema_view = get_schema_view(
 urlpatterns = [
     # path('', home, name='home'),
     # 초기화면 swagger 로 지정.
-    path('/swagger', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('admin/', admin.site.urls),
     
     # swagger
